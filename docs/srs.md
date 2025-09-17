@@ -21,7 +21,7 @@ Cada café teria uma foto, nome e preço fixo.
 
 Botão "Adicionar ao Carrinho" para cada item.
 
-# **Requisitos Funcionais**
+##### **Requisitos Funcionais**
 
 **RF05:** O sistema deve manter preços fixos para os cafés clássicos, sem permitir alterações pelos clientes.
 
@@ -45,7 +45,7 @@ Botão "Adicionar ao Carrinho" para cada item.
 
 ---
 
-# **Requisitos Não-Funcionais**
+##### **Requisitos Não-Funcionais**
 
 **RNF01:** O sistema deve garantir que os preços dos cafés clássicos permaneçam consistentes e imutáveis por clientes.
 
@@ -71,7 +71,7 @@ Uma lista dinâmica (que simula dados reais) dos 3 a 5 cafés mais pedidos. Deve
 - Expresso Duplo: Para um despertar intenso.
 - Cappuccino Trufado: Uma explosão de sabor.
 
-# **Requisitos Funcionais**
+##### **Requisitos Funcionais**
 
 **RF15:** O sistema deve gerar dinamicamente a lista de cafés "Mais Famosos" com base nos pedidos reais dos últimos 7 dias.
 
@@ -89,7 +89,7 @@ Uma lista dinâmica (que simula dados reais) dos 3 a 5 cafés mais pedidos. Deve
 
 ---
 
-# **Requisitos Não-Funcionais**
+##### **Requisitos Não-Funcionais**
 
 **RNF08:** O sistema deve processar e analisar dados de vendas em tempo quase real para garantir a atualidade das informações exibidas.
 

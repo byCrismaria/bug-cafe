@@ -20,25 +20,18 @@ Cada café teria uma foto, nome e preço fixo.
 
 ### **Requisitos Funcionais**
 
-**RF05:** O sistema deve manter preços fixos para os cafés clássicos, sem permitir alterações pelos clientes.
-
-**RF06:** O sistema deve verificar a disponibilidade em estoque de cada café clássico antes de permitir a adição ao carrinho.
-
-**RF07:** O sistema deve desabilitar o botão "Adicionar ao Carrinho" para itens indisponíveis no estoque.
-
-**RF08:** O sistema deve validar se o cliente está logado ao clicar no botão "Adicionar ao Carrinho".
-
-**RF09:** O sistema deve permitir que clientes não logados adicionem itens ao carrinho, mas exibir alerta sugerindo criação de conta para ganhar pontos.
-
-**RF10:** O sistema deve exigir login ou cadastro (ou compra sem cadastro) para finalização da compra.
-
-**RF11:** O sistema deve retornar mensagem de sucesso no formato JSON `{ "status": "success", "message": "Item adicionado ao carrinho com sucesso.", "item_id": 123 }` ao adicionar item ao carrinho.
-
-**RF12:** O sistema deve exibir notificação discreta no frontend confirmando a adição do item ao carrinho.
-
-**RF13:** O sistema deve retornar mensagem de erro no formato JSON `{ "status": "error", "message": "O item Espresso Tradicional está temporariamente indisponível." }` para itens indisponíveis.
-
-**RF14:** O sistema deve exibir pop-up ou alerta no frontend informando indisponibilidade do item.
+| Requisito | Descrição |
+|-----------|-----------|
+| <span style="color:#e63946; font-weight:bold">RF05</span> | O sistema deve manter preços fixos para os cafés clássicos, sem permitir alterações pelos clientes. |
+|**RF06:**| O sistema deve verificar a disponibilidade em estoque de cada café clássico antes de permitir a adição ao carrinho.|
+|**RF07:**| O sistema deve desabilitar o botão "Adicionar ao Carrinho" para itens indisponíveis no estoque.|
+|**RF08:**| O sistema deve validar se o cliente está logado ao clicar no botão "Adicionar ao Carrinho".|
+|**RF09:**| O sistema deve permitir que clientes não logados adicionem itens ao carrinho, mas exibir alerta sugerindo criação de conta para ganhar pontos.|
+|**RF10:**| O sistema deve exigir login ou cadastro (ou compra sem cadastro) para finalização da compra.|
+|**RF11:**|* O sistema deve retornar mensagem de sucesso no formato JSON `{ "status": "success", "message": "Item adicionado ao carrinho com sucesso.", "item_id": 123 }` ao adicionar item ao carrinho.|
+|**RF12:**| O sistema deve exibir notificação discreta no frontend confirmando a adição do item ao carrinho.|
+|**RF13:**| O sistema deve retornar mensagem de erro no formato JSON `{ "status": "error", "message": "O item Espresso Tradicional está temporariamente indisponível." }` para itens indisponíveis.|
+|**RF14:**| O sistema deve exibir pop-up ou alerta no frontend informando indisponibilidade do item.|
 
 ---
 

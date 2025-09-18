@@ -242,6 +242,10 @@ Uma pequena mensagem como:
 |**RNF36:**| A interface de usuário deve fornecer feedback claro e imediato sobre a validação dos campos durante o preenchimento.|
 
 ---
+### Protótipo 
+![Cadastro Usuário](./assets/cadastrouser.png)
+
+---
 
 ## 5. Página de Perfil (Após o Login)
 
@@ -287,3 +291,9 @@ Uma pequena mensagem como:
 |**RNF36:**| A interface do usuário deve fornecer feedback claro e imediato sobre a validação dos campos durante o preenchimento do formulário.|
 |**RNF37:**| O sistema deve garantir a confidencialidade dos dados de autenticação durante a transmissão (utilizando HTTPS).|
 |**RNF38:**| A performance do sistema de autenticação deve garantir tempos de resposta rápidos mesmo durante picos de acesso.|
+
+---
+### Protótipo 
+![Perfil usuário](./assets/perfilUser.png)
+
+---

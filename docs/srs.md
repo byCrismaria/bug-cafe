@@ -84,6 +84,10 @@ Uma lista dinâmica (que simula dados reais) dos 3 a 5 cafés mais pedidos. Deve
 |**RNF14:**| O sistema deve garantir a disponibilidade dos dados históricos de pedidos para permitir a geração precisa das estatísticas semanais.|
 
 ---
+### Protótipo 
+![Menu principal](./assets/menuprincipal.png)
+
+---
 
 ## 2. Seção "Monte Seu Café" (Crie seu Sabor)
 
@@ -128,6 +132,10 @@ Parte interativa onde o cliente irá personalizar o pedido, ou seja, pode criar 
 |**RNF21:**| A experiência de montagem do café deve ser intuitiva e responsiva, mesmo com múltiplas seleções simultâneas.|
 
 ---
+### Protótipo 
+![Monte seu café](./assets/monteseucafe.png)
+
+---
 
 ## 3. Carrinho de Compras
 
@@ -170,6 +178,10 @@ Parte interativa onde o cliente irá personalizar o pedido, ou seja, pode criar 
 |**RNF26:**| As mensagens de erro devem ser claras e orientar o usuário adequadamente sobre as próximas ações.|
 |**RNF27:**| O sistema deve manter a consistência nos formatos de resposta JSON para todas as operações do carrinho.|
 |**RNF28:**| A experiência do usuário no carrinho deve ser responsiva e funcionar sem necessidade de recarregar a página.|
+
+---
+### Protótipo 
+![Carrinho de compras](./assets/carrinhodecompras.png)
 
 ---
 

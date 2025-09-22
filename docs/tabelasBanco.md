@@ -183,8 +183,4 @@ direction TB
   * **`order_items` -- `order_item_customizations` (1 para muitos):** Um item de pedido (se for personalizado) pode ter várias opções de personalização.
   * **`customization_options` -- `order_item_customizations` (1 para muitos):** Uma opção de personalização (como "Leite de Amêndoas") pode ser usada em muitos itens de pedidos diferentes.
 
-
-  ---
-  ### Diagrama UML 
-  ![diagramauml](./assets/diagram_uml2025-09-22-192101.png)
   

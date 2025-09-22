@@ -5,6 +5,7 @@ Um **seeder** é um script que popula seu banco de dados com dados de teste ou d
 ### Passo a passo para criar o seeder com Knex.js
 
 1.  **Crie a pasta para os seeders:**
+
     Assim como nas migrações, o Knex.js precisa de uma pasta para os seeders. Se você seguiu o `knexfile.js` que eu sugeri, o comando para criar a pasta é:
 
     ```bash
@@ -12,6 +13,7 @@ Um **seeder** é um script que popula seu banco de dados com dados de teste ou d
     ```
 
 2.  **Crie o arquivo seeder:**
+
     Agora, gere o arquivo que irá adicionar os dados. Navegue para a pasta `backend` e execute o comando:
 
     ```bash
@@ -21,6 +23,7 @@ Um **seeder** é um script que popula seu banco de dados com dados de teste ou d
     Isso criará um arquivo com um nome no formato `initial_data.js` na pasta `db/seeds`.
 
 3.  **Adicionando os dados ao arquivo seeder:**
+
     Abra o arquivo recém-criado e adicione a lógica para inserir os dados nas tabelas `products` e `customization_options`. A função `exports.seed` é onde a inserção de dados acontece.
 
     ```javascript
@@ -98,6 +101,7 @@ Um **seeder** é um script que popula seu banco de dados com dados de teste ou d
     ```
 
 4.  **Execute o seeder:**
+
     Com o Docker Compose rodando (`docker-compose up -d`), vá para a pasta `backend` e execute o comando para popular o banco de dados:
 
     ```bash

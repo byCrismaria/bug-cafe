@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: bugcafe-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bugcafe
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend # Acha o Dockerfile aqui
+    container_name: bugcafe-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app # Mapeia a pasta local para o contêiner
+    depends_on:
+      - db
+    # Comando para rodar a aplicação quando o contêiner for iniciado
+    command: npm run dev 
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: bugcafe
+      DB_PORT: 5432
+
+volumes:
+  db_data:

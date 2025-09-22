@@ -1,3 +1,5 @@
+ # Configuração e uso do Migrations do banco de dados
+
  Usar "migrations" é a abordagem profissional e moderna para criar e gerenciar a estrutura do seu banco de dados. Em vez de executar SQL manualmente, você escreve o código que define as tabelas, e a ferramenta de migração se encarrega de aplicar essas mudanças de forma controlada.
 
 A principal vantagem é que seu esquema de banco de dados fica versionado junto com o seu código. Isso facilita o trabalho em equipe e a implantação em diferentes ambientes (desenvolvimento, testes, produção).
@@ -8,7 +10,8 @@ Knex.js é um construtor de SQL e uma ferramenta de migração muito popular no 
 
 ### Passo 1: Instalar o Knex.js e o driver do banco de dados
 
-´´´Bash
+
+```Bash
 yarn add knex pg
 ´´´
 
@@ -19,7 +22,8 @@ Na pasta backend, crie um arquivo chamado knexfile.js. Este arquivo dirá ao Kne
 
 2. Adicione o seguinte código:
 
-´´´JavaScript
+
+```JavaScript
 
 const path = require('path');
 
@@ -46,7 +50,8 @@ module.exports = {
 
 No terminal, a partir da pasta backend, crie as pastas db e migrations dentro dela:
 
-´´´Bash
+
+```Bash
 mkdir -p db/migrations
 ´´´
 O comando -p cria os diretórios pai, se necessário.
@@ -58,7 +63,8 @@ Será criado o arquivo que conterá as instruções SQL para criar suas tabelas.
 1. Gere o arquivo de migração:
 No terminal, a partir da pasta backend, execute o comando:
 
-´´´Bash
+
+```Bash
 npx knex migrate:make create_tables
 ´´´
 Isso irá criar um arquivo com um nome no formato AAAA_MM_DD_HHmmss_create_tables.js na pasta db/migrations.
@@ -69,7 +75,8 @@ Abra o arquivo recém-criado e adicione a lógica para criar suas tabelas users,
 
 Exemplo do conteúdo do arquivo de migração:
 
-´´´JavaScript
+
+```JavaScript
 
 exports.up = function(knex) {
   return knex.schema
@@ -139,7 +146,8 @@ exports.down = function(knex) {
 1. Certifique-se de que o seu contêiner do banco de dados está rodando.
 Se não estiver, navegue para a pasta raiz (bug-cafe) e execute:
 
-´´´Bash
+
+```Bash
 docker-compose up -d
 ´´´
 
@@ -148,7 +156,8 @@ O parâmetro -d roda em modo "detached" (em segundo plano), liberando seu termin
 2. Execute a migração:
 Navegue para a pasta backend e execute o comando:
 
-´´Bash
+
+```Bash
 npx knex migrate:latest´
 ´´´
 Isso irá aplicar todas as migrações pendentes no banco de dados, criando as tabelas definidas.

@@ -158,7 +158,7 @@ Navegue para a pasta backend e execute o comando:
 
 
 ```Bash
-npx knex migrate:latest´
+npx knex migrate:latest
 ```
 Isso irá aplicar todas as migrações pendentes no banco de dados, criando as tabelas definidas.
 

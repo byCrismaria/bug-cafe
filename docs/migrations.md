@@ -13,7 +13,7 @@ Knex.js é um construtor de SQL e uma ferramenta de migração muito popular no 
 
 ```Bash
 yarn add knex pg
-´´´
+```
 
 ### Passo 2: Configurar o Knex.js
 
@@ -45,7 +45,7 @@ module.exports = {
     }
   }
 };
-´´´
+```
 3. Crie as pastas para as migrações:
 
 No terminal, a partir da pasta backend, crie as pastas db e migrations dentro dela:
@@ -53,7 +53,7 @@ No terminal, a partir da pasta backend, crie as pastas db e migrations dentro de
 
 ```Bash
 mkdir -p db/migrations
-´´´
+```
 O comando -p cria os diretórios pai, se necessário.
 
 ### Passo 3: Criar o arquivo de migração
@@ -66,7 +66,7 @@ No terminal, a partir da pasta backend, execute o comando:
 
 ```Bash
 npx knex migrate:make create_tables
-´´´
+```
 Isso irá criar um arquivo com um nome no formato AAAA_MM_DD_HHmmss_create_tables.js na pasta db/migrations.
 
 2. Edite o arquivo de migração:
@@ -140,7 +140,7 @@ exports.down = function(knex) {
     .dropTableIfExists('products')
     .dropTableIfExists('users');
 };
-´´´
+```
 
 ### Passo 4: Executar a Migração
 1. Certifique-se de que o seu contêiner do banco de dados está rodando.
@@ -149,7 +149,7 @@ Se não estiver, navegue para a pasta raiz (bug-cafe) e execute:
 
 ```Bash
 docker-compose up -d
-´´´
+```
 
 O parâmetro -d roda em modo "detached" (em segundo plano), liberando seu terminal.
 
@@ -159,7 +159,7 @@ Navegue para a pasta backend e execute o comando:
 
 ```Bash
 npx knex migrate:latest´
-´´´
+```
 Isso irá aplicar todas as migrações pendentes no banco de dados, criando as tabelas definidas.
 
 

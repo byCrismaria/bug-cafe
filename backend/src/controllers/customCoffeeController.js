@@ -1,7 +1,9 @@
 const customCoffeeService = require('../services/customCoffeeService');
 
 const addCustomCoffeeToCart = async (req, res) => {
-    const { userId, cartId, customizations } = req.body;
+
+    const userId = req.user ? req.user.userId : null;
+    const { cartId, customizations } = req.body;
 
     // Validações básicas (RF25)
     if (!userId && !cartId) {

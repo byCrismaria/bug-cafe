@@ -1,12 +1,10 @@
 const cartService = require('../services/cartService');
 
 const addClassicCoffeeToCart = async (req, res) => {
-    const { productId, quantity, userId, cartId } = req.body;
+    //const { productId, quantity, userId, cartId } = req.body;
 
-    // Você precisará de uma forma de verificar se o usuário está logado (RF08)
-    // ou se a requisição veio de um usuário não logado.
-    // Para simplificar, assumimos que esta validação pode ser feita por um middleware
-    // ou no frontend, antes da requisição.
+    const userId = req.user ? req.user.userId : null;
+    const { productId, quantity, cartId } = req.body;
 
     // Validação para o campo productId
     if (!productId) {
@@ -55,9 +53,18 @@ const addClassicCoffeeToCart = async (req, res) => {
     } catch (error) {
         // Lida com o erro de indisponibilidade ou outros problemas
         // e retorna a mensagem de erro conforme RF13
-        res.status(400).json({
+        console.error("Erro no addClassicCoffeeToCart:", error);
+
+        if (error.message.includes('não disponível')) {
+            return res.status(400).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+        // Se for qualquer outro erro inesperado, retorna um erro genérico 500.
+        res.status(500).json({
             status: 'error',
-            message: error.message
+            message: 'Ocorreu um erro interno no servidor.'
         });
     }
 };
@@ -95,7 +102,7 @@ const getCart = async (req, res) => {
 //controller para ajustar a quantidade de um item no carrinho
 const adjustQuantity = async (req, res) => {
 
-    const userId = req.user.userId; 
+    const userId = req.user.userId;
     const { cartId, orderItemId, newQuantity } = req.body;
 
     if (!orderItemId || !newQuantity || newQuantity <= 0) {
@@ -122,7 +129,7 @@ const adjustQuantity = async (req, res) => {
 
 // controller para remover um item
 const removeItem = async (req, res) => {
-    
+
     const userId = req.user.userId;
     const { cartId, orderItemId } = req.body;
 

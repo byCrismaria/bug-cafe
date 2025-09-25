@@ -17,7 +17,7 @@ const getClassicCoffees = async () => {
 };
 
 const getMostFamous = async () => {
-    // Encontra os 5 itens mais vendidos nos últimos 7 dias, unindo as tabelas
+    // Encontra os 5 itens mais vendidos nos últimos 7 dias, unindo as tabelas para obter os detalhes dos produtos
     const mostFamous = await db('order_items')
         .join('orders', 'order_items.order_id', 'orders.order_id')
         .select('product_id', db.raw('SUM(quantity) as total_sold'))

@@ -3,12 +3,14 @@ const knexConfig = require('../../knexfile');
 const db = knex(knexConfig.development);
 
 const getClassicCoffees = async () => {
-    const coffees = await db('products').where({ is_customizable: false }).select('product_id', 'name', 'price', 'stock_quantity');
+    const coffees = await db('products').where({ is_customizable: false })
+    .select('product_id', 'name', 'description', 'price', 'stock_quantity');
     
     // Formatar a resposta (lógica de negócio)
     const formattedResponse = coffees.map(coffee => ({
         id: coffee.product_id,
         name: coffee.name,
+        description: coffee.description, 
         price: coffee.price,
         is_available: coffee.stock_quantity > 0
     }));
@@ -29,10 +31,20 @@ const getMostFamous = async () => {
     // Se houver dados, busque os detalhes dos produtos
     if (mostFamous.length > 0) {
         const famousIds = mostFamous.map(item => item.product_id);
-        const famousProducts = await db('products').whereIn('product_id', famousIds).select('name', 'description');
-        return famousProducts;
-    }
+        const famousProducts = await db('products')
+            .whereIn('product_id', famousIds)
+            .select('product_id', 'name', 'description', 'price', 'stock_quantity');
 
+
+        const formattedResponse = famousProducts.map(product => ({
+            id: product.product_id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            is_available: product.stock_quantity > 0
+        }));
+        return formattedResponse;        
+    }
     return [];
 };
 

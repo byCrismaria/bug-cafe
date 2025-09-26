@@ -1,0 +1,12 @@
+/* 1. Importe a Fonte Inter do Google Fonts */
+/* ESSENCIAL para o visual do protótipo */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+/* 3. Aplique os Estilos Padrão do Protótipo ao Corpo da Página */
+body {
+    /* Cor de fundo principal do protótipo */    
+    /* Fonte e cor de texto padrão */
+    font-family: 'Inter', sans-serif;
+     
+}

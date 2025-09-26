@@ -20,16 +20,33 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/app # Mapeia a pasta local para o contêiner
+      - /app/node_modules # Evita conflitos com node_modules
     depends_on:
       - db
     # Comando para rodar a aplicação quando o contêiner for iniciado
-    command: npm run dev 
+    command: yarn dev 
     environment:
       DB_HOST: db
       DB_USER: user
       DB_PASSWORD: password
       DB_NAME: bugcafe
       DB_PORT: 5432
+
+  frontend:
+    build: ./frontend # Aqui tá o Dockerfile e o código do frontend
+    container_name: bugcafe-frontend
+    ports:
+      # Mapeando a porta do contêiner (3000) pra porta 3001 no seu PC,
+      # pra não dar conflito com o backend!
+      - "3001:5173"
+    volumes:
+      # Mapeia a pasta local pro contêiner pra funcionar o live reload
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+      # Comando pra iniciar o servidor de desenvolvimento do frontend
+    command: npm run dev
 
 volumes:
   db_data:

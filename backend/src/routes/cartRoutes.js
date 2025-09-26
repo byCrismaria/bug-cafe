@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const cartController = require('../controllers/cartController');
-const { protect } = require('../middleware/authMiddleware');
+const {optionalAuth } = require('../middleware/authMiddleware');
 
 
 // Aplica o middleware 'protect' a TODAS as rotas que vêm depois.
-router.use(protect);
+router.use(optionalAuth);
 
 router.post('/add-classic', cartController.addClassicCoffeeToCart);
 router.get('/', cartController.getCart);

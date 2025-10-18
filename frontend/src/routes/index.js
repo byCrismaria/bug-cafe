@@ -21,12 +21,12 @@ const router = createRouter({
     {
       path: '/carrinho',
       name: 'cart',
-      component: CartView // URL: /carrinho
+      component: CartView 
     },
     {
       path: '/login-cadastro',
       name: 'auth',
-      component: AuthView // URL: /login-cadastro
+      component: AuthView 
     }
   ]
 });

@@ -120,7 +120,7 @@ const fetchClassicCoffees = async () => {
 };
 
 const addToCart = async (coffeeId) => {
-    console.log(`Adicionando café ID ${coffeeId} ao carrinho.`);
+
     const token = localStorage.getItem('authToken');
     let cartId = localStorage.getItem('cartId');
 
@@ -165,6 +165,3 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-
-</style>

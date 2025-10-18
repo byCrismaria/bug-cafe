@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const coffeeRoutes = require('./src/routes/coffeeRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
 const customCoffeeRoutes = require('./src/routes/customCoffeeRoutes');
@@ -11,6 +12,13 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.use(cors({
+    origin: '*', 
+    allowedHeaders: ['Content-Type', 'Authorization'], // Permite cabeçalhos específicos
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    credentials: true 
+}));
 
 // Use as rotas do backend
 app.use('/api', coffeeRoutes);

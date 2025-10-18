@@ -101,11 +101,14 @@ const getCartItems = async (userId, cartId) => {
             'order_items.unit_price',
             'order_items.subtotal',
             'products.name',
-            'products.is_customizable'
+            'products.is_customizable',
+            'products.description',
+            'products.image_url as image'
         );
 
     // 3. Para cada item personalizado, busca as personalizações
     const itemsWithCustomizations = await Promise.all(items.map(async item => {
+        let description = item.description || item.name;
         if (item.is_customizable) {
             const customizations = await db('order_item_customizations')
                 .join('customization_options', 'order_item_customizations.option_id', 'customization_options.option_id')
@@ -114,7 +117,19 @@ const getCartItems = async (userId, cartId) => {
 
             // Adiciona as personalizações ao item
             item.customizations = customizations;
+
+            if (customizations && customizations.length > 0) {
+                // Transforma as opções em um array de strings no formato: ['Categoria: Opção', 'Categoria: Opção']
+                const customizationDetails = customizations.map(c => `${c.category}: ${c.name}`);
+
+                // Combina tudo para formar a descrição final
+                // Ex: "Café Personalizado (Tamanho: Grande, Leite: Aveia)"
+                description = `${item.name} (${customizationDetails.join(', ')})`;
+            }
         }
+
+        item.description = description;
+
         return item;
     }));
 
@@ -127,6 +142,8 @@ const getCartItems = async (userId, cartId) => {
         total: total
     };
 };
+
+
 
 //função para ajusta a quantidade de um item no carrinho
 const adjustItemQuantity = async (userId, cartId, orderItemId, newQuantity) => {
@@ -202,6 +219,8 @@ const removeItem = async (userId, cartId, orderItemId) => {
         if (!orderItem) {
             throw new Error("Item não encontrado no carrinho.");
         }
+        // Remove personalizações associadas, se houver
+        await trx('order_item_customizations').where({ order_item_id: orderItemId }).del();
 
         // Devolve a quantidade removida para o estoque
         await trx('products').where({ product_id: orderItem.product_id }).increment('stock_quantity', orderItem.quantity);

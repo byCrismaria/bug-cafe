@@ -122,11 +122,35 @@
       </v-row>
     </v-responsive>
   </v-container>
+
+  <v-snackbar
+        v-model="snackbar.visible"
+        :timeout="3000"
+        :color="snackbar.color"
+        location="top right"
+        variant="elevated"
+    >
+        {{ snackbar.text }}
+    </v-snackbar>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import axios from 'axios';
+
+// --- ESTADO DO SNACKBAR ---
+const snackbar = reactive({
+  visible: false,
+  text: '',
+  color: 'success'
+});
+
+const showSnackbar = (text, color = 'info') => {
+  snackbar.text = text;
+  snackbar.color = color;
+  snackbar.visible = true;
+};
+
 
 // --- PROPS & EMITS ---
 const emit = defineEmits(['add-to-cart']);
@@ -157,7 +181,7 @@ const mapApiOptions = (apiOptions) => apiOptions.map(item => {
     return {
         label: item.name,
         value: item.name,
-        price: item.additional_price || 0, // Agora usa o valor correto do backend
+        price: item.additional_price || 0, 
         option_id: item.option_id
     };
 });

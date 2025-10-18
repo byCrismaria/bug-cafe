@@ -71,12 +71,12 @@ const addClassicCoffeeToCart = async (req, res) => {
 
 const getCart = async (req, res) => {
     //const { userId, cartId } = req.query;
-
-    const userId = req.user.userId;
+    //const userId = req.user.userId;
+    const userId = req.user ? req.user.userId : null; 
     const { cartId } = req.query;
 
-    if (!userId && !cartId) {
-        return res.status(400).json({ status: 'error', message: 'É necessário um userId ou cartId para obter o carrinho.' });
+      if (!userId && !cartId) {
+        return res.status(400).json({ status: 'error', message: 'É necessário um userId (usuário logado) ou cartId (convidado) para obter o carrinho.' });
     }
 
     try {
@@ -102,15 +102,16 @@ const getCart = async (req, res) => {
 //controller para ajustar a quantidade de um item no carrinho
 const adjustQuantity = async (req, res) => {
 
-    const userId = req.user.userId;
-    const { cartId, orderItemId, newQuantity } = req.body;
+    const userId = req.user ? req.user.userId : null;
+    const { itemId } = req.params; 
+    const { newQuantity, cartId } = req.body; 
 
-    if (!orderItemId || !newQuantity || newQuantity <= 0) {
+    if (!itemId || !newQuantity || newQuantity <= 0) {
         return res.status(400).json({ status: 'error', message: 'Dados inválidos. Verifique o ID do item e a nova quantidade.' });
     }
 
     try {
-        const result = await cartService.adjustItemQuantity(userId, cartId, orderItemId, newQuantity);
+        const result = await cartService.adjustItemQuantity(userId, cartId, itemId, newQuantity);
         // Retorna a mensagem de sucesso conforme RF36
         res.status(200).json({
             status: 'success',
@@ -129,24 +130,22 @@ const adjustQuantity = async (req, res) => {
 
 // controller para remover um item
 const removeItem = async (req, res) => {
+    const userId = req.user ? req.user.userId : null;
+    const { itemId } = req.params; 
+    const { cartId } = req.body;
 
-    const userId = req.user.userId;
-    const { cartId, orderItemId } = req.body;
-
-    if (!orderItemId) {
+    if (!itemId) {
         return res.status(400).json({ status: 'error', message: 'ID do item do carrinho é obrigatório.' });
     }
 
     try {
-        const result = await cartService.removeItem(userId, cartId, orderItemId);
-        // Retorna a mensagem de sucesso conforme RF38
+        const result = await cartService.removeItem(userId, cartId, itemId);
         res.status(200).json({
             status: 'success',
             message: "Item removido do carrinho.",
             new_total: parseFloat(result.new_total)
         });
     } catch (error) {
-        // Retorna a mensagem de erro (RF40)
         res.status(400).json({
             status: 'error',
             message: error.message

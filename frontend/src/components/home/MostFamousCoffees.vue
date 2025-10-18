@@ -38,15 +38,15 @@
             @click.stop="addToCart(coffee.id)"
           >
             Adicionar ao Carrinho
-          </v-btn>        
+          </v-btn> 		
+          </div>
         </div>
-      </div>
       </v-card>
     </v-slide-group-item>
   </v-slide-group>
 
   <!-- Snackbar para notificações -->
-    <v-snackbar
+  <v-snackbar
       v-model="snackbar.visible"
       :timeout="3000"
       :color="snackbar.color"
@@ -54,11 +54,18 @@
       variant="elevated"
     >
       {{ snackbar.text }}
+      <template v-slot:actions>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          @click="snackbar.visible = false"
+        ></v-btn>
+      </template>
     </v-snackbar>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive  } from 'vue';
+import { ref, onMounted, reactive 	} from 'vue';
 import axios from 'axios';
 
 const mostFamous = ref([]);
@@ -97,8 +104,10 @@ const fetchMostFamous = async () => {
 
 // Função para adicionar ao carrinho (reutilizando a lógica do outro componente)
 const addToCart = async (coffeeId) => {
+
     const token = localStorage.getItem('authToken');
     let cartId = localStorage.getItem('cartId');
+
     const authData = {};
 
     if (token) {
@@ -117,10 +126,14 @@ const addToCart = async (coffeeId) => {
         if (authData.cartId) { body.cartId = authData.cartId; }
 
         const response = await axios.post('/api/cart/add-classic', body, { headers });
+        
         if (response.data.status === 'success') {
-          showSnackbar(response.data.message || 'Item adicionado com sucesso!', 'success');
+          const coffeeName = mostFamous.value.find(c => c.id === coffeeId)?.name || 'Item';
+          const successMessage = response.data.message || `${coffeeName} adicionado com sucesso!`;
+          showSnackbar(successMessage, 'success');
         }
     } catch (error) {
+        console.error('Erro ao adicionar item ao carrinho:', error);
         const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
         showSnackbar(`Erro: ${errorMessage}`, 'error');
     }
@@ -130,3 +143,9 @@ onMounted(() => {
   fetchMostFamous();
 });
 </script>
+
+<style scoped>
+
+</style>
+
+

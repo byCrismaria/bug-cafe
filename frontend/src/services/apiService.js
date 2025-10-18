@@ -118,7 +118,7 @@ const apiService = {
 
     let data = {};
     if (!token) {
-      data.cartId = cartId; 
+      data.cartId = cartId;
     }
 
     try {
@@ -170,6 +170,60 @@ const apiService = {
     } catch (error) {
       console.error('Erro ao buscar cafés mais famosos:', error);
       throw new Error(error.response?.data?.message || error.message || 'Erro ao buscar produtos.');
+    }
+  },
+
+  // apiService.js - Funções de autenticação
+
+  /**
+   * Registra um novo usuário.
+   * Endpoint: POST /api/auth/register
+   */
+  async register(fullName, email, password, confirmPassword) {
+    try {
+      const payload = {
+        name: fullName, // ✅ O backend espera "name" não "fullName"
+        email,
+        password,
+        confirmPassword
+      };
+
+      const response = await api.post('/auth/register', payload);
+
+      // ✅ O backend retorna { status, message }
+      if (response.data.status === 'success') {
+        return response.data;
+      } else {
+        throw new Error(response.data.message || 'Erro no cadastro');
+      }
+    } catch (error) {
+      console.error('Erro ao registrar usuário:', error);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao realizar cadastro.');
+    }
+  },
+
+  /**
+   * Autentica um usuário.
+   * Endpoint: POST /api/auth/login
+   */
+  async login(email, password) {
+    try {
+      const payload = {
+        email,
+        password
+      };
+
+      const response = await api.post('/auth/login', payload);
+
+      // ✅ O backend retorna { status, message, data: { token, userId, name } }
+      if (response.data.status === 'success') {
+        return response.data;
+      } else {
+        throw new Error(response.data.message || 'Erro no login');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao realizar login.');
     }
   },
 };

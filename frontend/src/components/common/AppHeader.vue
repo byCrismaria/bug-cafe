@@ -15,14 +15,20 @@
       <div class="d-flex align-center d-md-none ms-2">
 
         <!-- Botão Carrinho (Mobile) -->
-        <RouterLink to="/carrinho" class="text-decoration-none">
-          <v-btn icon variant="text" class="text-grey-darken-1">
-            <v-badge :content="cartCount" color="red" dot floating offset-y="-10" v-if="cartCount > 0">
-              <v-icon>mdi-cart</v-icon>
-            </v-badge>
-            <v-icon v-else>mdi-cart</v-icon>
-          </v-btn>
-        </RouterLink>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <RouterLink to="/carrinho" class="text-decoration-none">
+              <v-btn v-bind="attrs" v-on="on" icon variant="text" class="text-grey-darken-1"
+                :disabled="cartCount === 0">
+                <v-badge :content="cartCount" color="red" dot floating offset-y="-10" v-if="cartCount > 0">
+                  <v-icon>mdi-cart</v-icon>
+                </v-badge>
+                <v-icon v-else>mdi-cart</v-icon>
+              </v-btn>
+            </RouterLink>
+          </template>
+          <span v-if="cartCount === 0">Adicione itens ao carrinho para acessá-lo.</span>
+        </v-tooltip>
 
         <RouterLink to="/login-cadastro" class="text-decoration-none">
           <v-btn color="primary" size="small" class="font-weight-medium ms-2 d-none d-sm-flex">
@@ -59,18 +65,23 @@
       <div class="d-none d-md-flex align-center ga-4">
 
         <!-- Botão Carrinho com Rótulo (Desktop) -->
-        <RouterLink to="/carrinho" v-slot="{ href, navigate, isActive }">
-          <v-btn variant="text" @click="navigate" :class="[
-            'nav-link',
-            'text-subtitle-1',
-            isActive ? 'text-brown-darken-3' : 'text-grey-darken-1'
-          ]" :color="isActive ? 'brown-darken-3' : undefined">
-            Carrinho
-            <v-badge :content="cartCount" :model-value="cartCount > 0" color="red" inline class="ml-1">
-              <v-icon right>mdi-cart</v-icon>
-            </v-badge>
-          </v-btn>
-        </RouterLink>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <RouterLink to="/carrinho" v-slot="{ href, navigate, isActive }">
+              <v-btn v-bind="attrs" v-on="on" variant="text" @click="navigate" :class="[
+                'nav-link',
+                'text-subtitle-1',
+                isActive ? 'text-brown-darken-3' : 'text-grey-darken-1'
+              ]" :color="isActive ? 'brown-darken-3' : undefined" :disabled="cartCount === 0">
+                Carrinho
+                <v-badge :content="cartCount" :model-value="cartCount > 0" color="red" inline class="ml-1">
+                  <v-icon right>mdi-cart</v-icon>
+                </v-badge>
+              </v-btn>
+            </RouterLink>
+          </template>
+          <span v-if="cartCount === 0">Adicione itens ao carrinho para acessá-lo.</span>
+        </v-tooltip>
 
         <RouterLink to="/login-cadastro" class="text-decoration-none text-subtitle-1-grey-darken-1">
           <v-btn variant="text" class="text-grey-darken-1 nav-link">

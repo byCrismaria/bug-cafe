@@ -7,6 +7,30 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Interceptor para adicionar o token JWT no cabeçalho Authorization
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken'); // Obtém o token do localStorage
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`; // Adiciona o token ao cabeçalho Authorization
+  }
+  return config;
+});
+
+
+// Função para obter o carrinho
+export const getCart = async (userId, cartId) => {
+    if (!userId && !cartId) {
+        throw new Error("É necessário fornecer um userId ou cartId para obter o carrinho.");
+    }
+
+    const response = await api.get('/cart', {
+        params: { userId, cartId },
+    });
+
+    return response.data;
+};
+
+
 function handleResponse(response) {
   if (response.data.status === 'success') {
     return response.data.data;
@@ -42,9 +66,9 @@ const apiService = {
    * Busca os itens do carrinho.
    * Endpoint: GET /api/cart/
    */
+  getCart,
   async fetchCart() {
     const { headers, cartId, token } = getAuthDetails();
-
     const params = cartId ? { cartId } : {};
 
     try {
@@ -182,7 +206,7 @@ const apiService = {
   async register(fullName, email, password, confirmPassword) {
     try {
       const payload = {
-        name: fullName, // ✅ O backend espera "name" não "fullName"
+        name: fullName, // O backend espera "name" não "fullName"
         email,
         password,
         confirmPassword
@@ -190,7 +214,7 @@ const apiService = {
 
       const response = await api.post('/auth/register', payload);
 
-      // ✅ O backend retorna { status, message }
+      // O backend retorna { status, message }
       if (response.data.status === 'success') {
         return response.data;
       } else {
@@ -215,9 +239,15 @@ const apiService = {
 
       const response = await api.post('/auth/login', payload);
 
-      // ✅ O backend retorna { status, message, data: { token, userId, name } }
+      // O backend retorna { status, message, data: { token, userId, name } }
       if (response.data.status === 'success') {
+
+       const { token, userId } = response.data.data;
+
+        // Armazena o token no localStorage
+        localStorage.setItem('authToken', token);
         return response.data;
+        
       } else {
         throw new Error(response.data.message || 'Erro no login');
       }
@@ -225,6 +255,21 @@ const apiService = {
       console.error('Erro ao fazer login:', error);
       throw new Error(error.response?.data?.message || error.message || 'Erro ao realizar login.');
     }
+  },
+
+  /**
+   * Obtém os itens do carrinho.
+   * @returns {Promise<object>} Dados do carrinho.
+   */
+  async getCartItems() {
+    const { headers, cartId, token } = getAuthDetails();
+
+    if (!token && !cartId) {
+      throw new Error("Não foi possível identificar o usuário ou o carrinho. Faça login ou adicione itens como convidado.");
+    }
+
+    const response = await api.get('/cart', { headers, params: { cartId } });
+    return handleResponse(response);
   },
 };
 

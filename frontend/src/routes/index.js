@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import HomeView from '../views/HomeView.vue'; 
-import MonteSeuCafeView from '../views/MonteSeuCafeView.vue'; 
+import HomeView from '../views/HomeView.vue';
+import MonteSeuCafeView from '../views/MonteSeuCafeView.vue';
 import CartView from '../views/CartView.vue';
-import AuthView from '../views/AuthView.vue';    
+import AuthView from '../views/AuthView.vue';
+import AboutView from '../views/AboutView.vue';
+import TermsOfServiceView from '../views/TermsOfServiceView.vue';
+import ContactView from '../views/ContactView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,7 +14,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView 
+      component: HomeView
     },
     {
       path: '/monte-seu-cafe',
@@ -21,13 +24,28 @@ const router = createRouter({
     {
       path: '/carrinho',
       name: 'cart',
-      component: CartView 
+      component: CartView
     },
     {
       path: '/login-cadastro',
       name: 'auth',
-      component: AuthView 
-    }
+      component: AuthView
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: AboutView
+    },
+    {
+      path: '/terms',
+      name: 'TermsOfService',
+      component: TermsOfServiceView
+    },
+    {
+      path: '/contact',
+      name: 'Contact',
+      component: ContactView
+    },
   ]
 });
 

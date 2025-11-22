@@ -16,18 +16,14 @@ const protect = (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             
             // 3. Adiciona o ID do usuário ao objeto de requisição (req)
-            req.user = decoded; // Agora podemos acessar req.user.userId em qualquer rota protegida
+            req.user = decoded; 
             
             next(); // Continua para a próxima middleware ou rota
             
         } catch (error) {
-            console.error('Erro de autenticação:', error.message);
             res.status(401).json({ status: 'error', message: 'Não autorizado, token inválido.' });
         }
-    }
-    
-    // Se não houver token no cabeçalho
-    if (!token) {
+    }else {
         res.status(401).json({ status: 'error', message: 'Não autorizado, token não encontrado.' });
     }
 };

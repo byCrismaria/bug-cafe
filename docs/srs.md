@@ -133,7 +133,7 @@ Parte interativa onde o cliente irá personalizar o pedido, ou seja, pode criar 
 
 ---
 ### Protótipo 
-![Monte seu café](./assets/monteseucafe.png)
+![Monte seu café](./assets/monteseucafe2.png)
 
 ---
 

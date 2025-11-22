@@ -74,6 +74,16 @@ const addClassicCoffeeToCart = async (productId, quantity = 1, userId, cartId) =
 
 const getCartItems = async (userId, cartId) => {
 
+    if (!userId && !cartId) {
+        throw new Error(
+            userId === undefined && cartId === undefined
+                ? "Nenhum parâmetro foi fornecido. É necessário um userId (usuário logado) ou cartId (convidado) para obter o carrinho."
+                : userId === undefined
+                ? "O parâmetro userId está ausente. Forneça um userId ou cartId para obter o carrinho."
+                : "O parâmetro cartId está ausente. Forneça um userId ou cartId para obter o carrinho."
+        );
+    }
+
     // 1. Encontra o pedido "Pendente"
     let order;
     if (userId) {

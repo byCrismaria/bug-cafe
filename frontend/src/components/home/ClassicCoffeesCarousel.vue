@@ -68,7 +68,10 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
+import { useCart } from '../../composables/useCart.js';
 import axios from 'axios';
+
+const { addClassicToCart } = useCart(); 
 
 const API_URL = '/api/classic-coffees';
 const classicCoffees = ref([]);
@@ -119,7 +122,7 @@ const fetchClassicCoffees = async () => {
     }
 };
 
-const addToCart = async (coffeeId) => {
+/* const addToCart = async (coffeeId) => {
 
     const token = localStorage.getItem('authToken');
     let cartId = localStorage.getItem('cartId');
@@ -159,7 +162,19 @@ const addToCart = async (coffeeId) => {
         const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
         showSnackbar(`Erro: ${errorMessage}`, 'error');
     }
+}; */
+
+const addToCart = async (coffeeId) => {
+  console.log('coffeeId:', coffeeId); 
+  try {
+    const successMessage = await addClassicToCart(coffeeId, 1);
+    showSnackbar(successMessage || 'Item adicionado com sucesso!', 'success');
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
+    showSnackbar(`Erro: ${errorMessage}`, 'error');
+  }
 };
+
 onMounted(() => {
     fetchClassicCoffees();
 });

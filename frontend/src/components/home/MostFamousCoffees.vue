@@ -66,7 +66,10 @@
 
 <script setup>
 import { ref, onMounted, reactive 	} from 'vue';
+import { useCart } from '../../composables/useCart.js';
 import axios from 'axios';
+
+const { addClassicToCart } = useCart();
 
 const mostFamous = ref([]);
 const API_URL = '/api/most-famous';
@@ -102,7 +105,7 @@ const fetchMostFamous = async () => {
   }
 };
 
-// Função para adicionar ao carrinho (reutilizando a lógica do outro componente)
+/* // Função para adicionar ao carrinho (reutilizando a lógica do outro componente)
 const addToCart = async (coffeeId) => {
 
     const token = localStorage.getItem('authToken');
@@ -137,6 +140,18 @@ const addToCart = async (coffeeId) => {
         const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
         showSnackbar(`Erro: ${errorMessage}`, 'error');
     }
+}; */
+
+const addToCart = async (coffeeId) => {
+  try {
+    const successMessage = await addClassicToCart(coffeeId, 1);
+    const coffeeName = mostFamous.value.find(c => c.id === coffeeId)?.name || 'Item';
+    showSnackbar(successMessage || `${coffeeName} adicionado com sucesso!`, 'success');
+  } catch (error) {
+    console.error('Erro ao adicionar item ao carrinho:', error);
+    const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
+    showSnackbar(`Erro: ${errorMessage}`, 'error');
+  }
 };
 
 onMounted(() => {

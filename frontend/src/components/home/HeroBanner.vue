@@ -56,7 +56,6 @@ const slides = ref([
 <style scoped>
 /* Estilos para a sombra e sobreposição */
 
-/* Esta classe adiciona uma sobreposição escura (overlay) para melhorar o contraste do texto sobre a imagem */
 .v-overlay-scrim {
   content: '';
   position: absolute;
@@ -68,7 +67,6 @@ const slides = ref([
   z-index: 1;
 }
 
-/* Garante que o texto tenha uma sombra sutil para se destacar, simulando o Tailwind drop-shadow-lg */
 .drop-shadow-lg {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }

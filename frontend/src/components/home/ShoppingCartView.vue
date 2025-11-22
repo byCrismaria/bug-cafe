@@ -131,8 +131,10 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, computed } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import apiService from '../../services/apiService.js';
+import { useCart } from '../../composables/useCart.js';
+const { cartState, removeItemFromCart, loadCart } = useCart();
 
 // --- Constantes e Variáveis Reativas ---
 const TAX_RATE = 0.05; // 5% de taxa de imposto/serviço
@@ -142,7 +144,7 @@ const isCheckingOut = ref(false);
 
 // Estrutura do Carrinho adaptada ao retorno da API
 const cartData = reactive({
-  userId: localStorage.getItem('authToken') ? 'Usuário Logado' : localStorage.getItem('cartId') || 'Convidado',
+  userId: localStorage.getItem('userId') || localStorage.getItem('cartId') || 'Convidado',
   items: [],
   total: 0,
   subtotal: 0,
@@ -194,26 +196,55 @@ const calculateTotals = (totalFromApi) => {
 
 // --- Lógica de Carregamento ---
 
+//* Sincroniza os dados do carrinho global com o local. */
+const syncCartData = () => {
+  cartData.items = cartState.items.map(item => ({
+    ...item,
+    itemId: item.order_item_id,
+    isUpdating: false,
+    unit_price: parseFloat(item.unit_price),
+    quantity: parseInt(item.quantity),
+    subtotal: parseFloat(item.subtotal),
+  }));
+  calculateTotals(cartState.total || 0);
+  cartData.userId = localStorage.getItem('authToken') ? 'Usuário Logado' : (localStorage.getItem('cartId') || 'Convidado');
+};
+
 /** Carrega os dados do carrinho do backend. */
-const loadCart = async () => {
+const loadCartItens = async () => {
   isLoading.value = true;
   try {
-    const data = await apiService.fetchCart();
 
-    // Mapeia os itens da API para adicionar o estado de isUpdating
-    cartData.items = data.items.map(item => ({
+    // Obtém o cartId dinamicamente do localStorage
+    const cartId = localStorage.getItem('cartId');
+    const userId = localStorage.getItem('authToken') ? 'Usuário Logado' : null;
+
+    if (!cartId && !userId) {
+      throw new Error('Nenhum cartId ou userId encontrado. Faça login ou inicie uma sessão como convidado.');
+    }
+
+    const response = await apiService.getCart(userId, cartId);
+
+    // Mapeia os itens para a estrutura esperada
+    const data = response?.data || response;
+    cartData.items = Array.isArray(data.items) ? data.items.map(item => ({
       ...item,
       itemId: item.order_item_id,
       isUpdating: false,
       unit_price: parseFloat(item.unit_price),
       quantity: parseInt(item.quantity),
       subtotal: parseFloat(item.subtotal),
-    }));
+    })) : [];
 
-    calculateTotals(data.total || data.total_price || 0);
+    calculateTotals(data.total || 0);
 
     // Atualiza o ID de referência
-    cartData.userId = localStorage.getItem('authToken') ? 'Usuário Logado' : localStorage.getItem('cartId') || 'Convidado';
+    cartData.userId = userId || cartId;
+
+    // Exibe a mensagem do backend, se houver
+    if (data.message) {
+      showSnackbar(data.message, 'info');
+    }
 
   } catch (error) {
     // Inicializa o carrinho vazio em caso de erro
@@ -223,9 +254,8 @@ const loadCart = async () => {
   } finally {
     isLoading.value = false;
   }
-};
+}; 
 
-/** Atualiza a quantidade de um item */
 const updateCartItemQuantity = async (orderItemId, change) => {
   const item = cartData.items.find(item => item.order_item_id === orderItemId);
   if (!item) return;
@@ -247,7 +277,7 @@ const updateCartItemQuantity = async (orderItemId, change) => {
     const responseData = result?.data || result || {};
     // Atualiza os dados locais
     const newSubtotal = responseData.new_subtotal || (item.unit_price * newQuantity);
-    await loadCart();
+    await loadCartItens();
 
     showSnackbar('Quantidade atualizada com sucesso!', 'success');
   } catch (error) {
@@ -266,14 +296,14 @@ const updateCartItemQuantity = async (orderItemId, change) => {
     }
 
     // Recarrega o carrinho para sincronizar
-    await loadCart();
+    await loadCartItens();
   } finally {
     item.isUpdating = false;
   }
 };
 
-/** Remove um item do carrinho */
-const removeItem = async (orderItemId) => {
+
+/* const removeItem = async (orderItemId) => {
   const item = cartData.items.find(item => item.order_item_id === orderItemId);
   if (!item) return;
 
@@ -291,13 +321,35 @@ const removeItem = async (orderItemId) => {
       cartData.items.splice(itemIndex, 1);
     }
 
-    await loadCart();
+    await loadCartItens();
     showSnackbar('Item removido do carrinho', 'success');
   } catch (error) {
     console.error('Erro ao remover item:', error);
     showSnackbar(error.message || 'Erro ao remover item. Tente novamente.', 'error');
 
     // Recarrega o carrinho para sincronizar
+    await loadCartItens();
+  } finally {
+    item.isUpdating = false;
+  }
+};
+ */
+
+ const removeItem = async (orderItemId) => {
+  const item = cartData.items.find(item => item.order_item_id === orderItemId);
+  if (!item) return;
+
+  item.isUpdating = true;
+
+  try {
+    // Chama a função centralizada do useCart.js
+    await removeItemFromCart(orderItemId);
+    showSnackbar('Item removido do carrinho', 'success');
+    await loadCart(); // Atualiza o carrinho após remoção
+    syncCartData();
+  } catch (error) {
+    console.error('Erro ao remover item:', error);
+    showSnackbar(error.message || 'Erro ao remover item. Tente novamente.', 'error');
     await loadCart();
   } finally {
     item.isUpdating = false;
@@ -327,7 +379,10 @@ const checkout = async () => {
   }
 };
 
-onMounted(loadCart);
+onMounted(() => {
+  loadCart();
+  loadCartItens();
+});
 </script>
 
 <style scoped>

@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue';
 import MonteSeuCafeView from '../views/MonteSeuCafeView.vue';
 import CartView from '../views/CartView.vue';
 import AuthView from '../views/AuthView.vue';
+import AuthProfile from '../views/AuthProfile.vue';
 import AboutView from '../views/AboutView.vue';
 import TermsOfServiceView from '../views/TermsOfServiceView.vue';
 import ContactView from '../views/ContactView.vue';
@@ -30,6 +31,14 @@ const router = createRouter({
       path: '/login-cadastro',
       name: 'auth',
       component: AuthView
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: AuthProfile,
+      meta: { 
+        requiresAuth: true 
+      }
     },
     {
       path: '/about',

@@ -1,5 +1,8 @@
 <template>
   <v-container class="py-8">
+    <v-overlay :model-value="isLoading.login" class="d-flex align-center justify-center" persistent>
+      <v-progress-circular indeterminate color="#b45309" size="64" />
+    </v-overlay>
     <v-card class="mx-auto pa-8" elevation="8" max-width="1200" rounded="lg">
       <v-row>
         <!-- Coluna de Boas-vindas -->
@@ -189,17 +192,15 @@ const handleLogin = async () => {
 
       // Salva o token
       localStorage.setItem('authToken', token);
-      localStorage.setItem('userName', result.data.name); // Opcional: salvar nome do usuário
+      localStorage.setItem('userName', result.data.name);
 
       showSnackbar(message, 'success');
 
       // Limpa o cartId local
       localStorage.removeItem('cartId');
 
-      // Redireciona para a página inicial
-      setTimeout(() => {
-        router.push('/');
-      }, 1500);
+      // Redireciona para a página de perfil
+      router.push('/profile');
     } else {
       throw new Error(result.message || 'Erro no login');
     }

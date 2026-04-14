@@ -1,25 +1,25 @@
 const orderService = require('../services/orderService');
 
 const checkout = async (req, res) => {
-    const userId = req.user.userId;
-    const { orderId } = req.body;
+    const userId = req.user?.userId || null;
+    const { cartId } = req.body || {};
 
-    if (!orderId) {
-        return res.status(400).json({ status: 'error', message: 'ID do pedido é obrigatório para o checkout.' });
+    if (!userId && !cartId) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Faça login ou forneça um cartId para finalizar o pedido.'
+        });
     }
 
     try {
-        const completedOrder = await orderService.checkoutOrder(userId, orderId);
-        res.status(200).json({
-            status: 'success',
-            message: 'Pedido finalizado com sucesso! Pontos adicionados à sua conta.',
-            data: completedOrder
-        });
+        const completedOrder = await orderService.checkoutOrder(userId, cartId);
+        const message = userId
+            ? 'Pedido finalizado com sucesso! Pontos adicionados à sua conta.'
+            : 'Pedido finalizado com sucesso!';
+
+        res.status(200).json({ status: 'success', message, data: completedOrder });
     } catch (error) {
-        res.status(400).json({
-            status: 'error',
-            message: error.message
-        });
+        res.status(400).json({ status: 'error', message: error.message });
     }
 };
 

@@ -30,9 +30,15 @@
           <span v-if="cartCount === 0">Adicione itens ao carrinho para acessá-lo.</span>
         </v-tooltip>
 
-        <RouterLink to="/login-cadastro" class="text-decoration-none">
+        <RouterLink v-if="!isAuthenticated" to="/login-cadastro" class="text-decoration-none">
           <v-btn color="primary" size="small" class="font-weight-medium ms-2 d-none d-sm-flex">
             Login
+          </v-btn>
+        </RouterLink>
+        <RouterLink v-else to="/profile" class="text-decoration-none">
+          <v-btn color="primary" size="small" class="font-weight-medium ms-2 d-none d-sm-flex">
+            <v-icon start>mdi-account-circle</v-icon>
+            {{ userName }}
           </v-btn>
         </RouterLink>
 
@@ -83,11 +89,24 @@
           <span v-if="cartCount === 0">Adicione itens ao carrinho para acessá-lo.</span>
         </v-tooltip>
 
-        <RouterLink to="/login-cadastro" class="text-decoration-none text-subtitle-1-grey-darken-1">
-          <v-btn variant="text" class="text-grey-darken-1 nav-link">
-            Login / Cadastro
+        <template v-if="isAuthenticated">
+          <RouterLink to="/profile" class="text-decoration-none">
+            <v-btn variant="text" class="text-grey-darken-1 nav-link">
+              <v-icon start>mdi-account-circle</v-icon>
+              {{ userName }}
+            </v-btn>
+          </RouterLink>
+          <v-btn variant="text" class="text-grey-darken-1 nav-link" @click="handleLogout">
+            Sair
           </v-btn>
-        </RouterLink>
+        </template>
+        <template v-else>
+          <RouterLink to="/login-cadastro" class="text-decoration-none">
+            <v-btn variant="text" class="text-grey-darken-1 nav-link">
+              Login / Cadastro
+            </v-btn>
+          </RouterLink>
+        </template>
 
       </div>
 
@@ -96,16 +115,23 @@
 </template>
 
 <script setup>
-// Importamos o RouterLink para uso no template
-import { RouterLink } from 'vue-router';
-// 1. O cartCount agora é uma PROP que vem do App.vue
+import { RouterLink, useRouter } from 'vue-router';
+import { useAuth } from '../../composables/useAuth.js';
 
 defineProps({
   cartCount: {
     type: Number,
     default: 0
   }
-}); 
+});
+
+const router = useRouter();
+const { isAuthenticated, userName, logout } = useAuth();
+
+const handleLogout = () => {
+  logout();
+  router.push('/');
+};
 </script>
 
 <style scoped>

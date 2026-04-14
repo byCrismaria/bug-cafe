@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// Defina a URL base do seu servidor backend aqui
-const API_BASE_URL = 'http://localhost:3000/api';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '/api',
 });
 
 // Interceptor para adicionar o token JWT no cabeçalho Authorization
@@ -69,7 +66,6 @@ const apiService = {
   getCart,
   async fetchCart() {
     const { headers, cartId, token } = getAuthDetails();
-    const params = cartId ? { cartId } : {};
 
     try {
       // Se for convidado, passamos o cartId como query param para melhor compatibilidade.
@@ -155,8 +151,8 @@ const apiService = {
   },
 
   /**
-   * Simula a ação de checkout.
-   * Endpoint: POST /api/checkout/
+   * Finaliza o pedido pendente do usuário (simula pagamento aprovado).
+   * Endpoint: POST /api/orders/checkout
    */
   async checkoutCart() {
     const { headers, cartId, token } = getAuthDetails();
@@ -167,8 +163,8 @@ const apiService = {
     }
 
     try {
-      const response = await api.post('/checkout/', payload, { headers });
-      return handleResponse(response);
+      const response = await api.post('/orders/checkout', payload, { headers });
+      return response.data;
     } catch (error) {
       console.error('Erro ao finalizar o checkout:', error);
       throw new Error(error.response?.data?.message || error.message || 'Erro ao finalizar o pedido.');
@@ -242,7 +238,7 @@ const apiService = {
       // O backend retorna { status, message, data: { token, userId, name } }
       if (response.data.status === 'success') {
 
-       const { token, userId } = response.data.data;
+       const { token } = response.data.data;
 
         // Armazena o token no localStorage
         localStorage.setItem('authToken', token);
@@ -270,6 +266,67 @@ const apiService = {
 
     const response = await api.get('/cart', { headers, params: { cartId } });
     return handleResponse(response);
+  },
+
+  /**
+   * Adiciona um café personalizado ao carrinho.
+   * Endpoint: POST /api/custom-coffee/add-custom
+   */
+  async addCustomCoffeeToCart(customizationIds) {
+    const { headers, cartId, token } = getAuthDetails();
+    const payload = { customizations: customizationIds };
+    if (!token) payload.cartId = cartId;
+
+    try {
+      const response = await api.post('/custom-coffee/add-custom', payload, { headers });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Erro ao adicionar café personalizado:', error);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao adicionar ao carrinho.');
+    }
+  },
+
+  /**
+   * Remove um item do carrinho.
+   * Endpoint: DELETE /api/cart/items/:itemId
+   */
+  async deleteCartItem(orderItemId) {
+    const { headers, cartId, token } = getAuthDetails();
+    const data = !token && cartId ? { cartId } : {};
+
+    try {
+      const response = await api.delete(`/cart/items/${orderItemId}`, { headers, data });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Erro ao remover item do carrinho:', error);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao remover item.');
+    }
+  },
+
+  /**
+   * Solicita redefinição de senha.
+   * Endpoint: POST /api/auth/forgot-password
+   */
+  async forgotPassword(email) {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao solicitar redefinição de senha.');
+    }
+  },
+
+  /**
+   * Redefine a senha usando o token recebido por e-mail.
+   * Endpoint: POST /api/auth/reset-password
+   */
+  async resetPassword(token, password, confirmPassword) {
+    try {
+      const response = await api.post('/auth/reset-password', { token, password, confirmPassword });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao redefinir senha.');
+    }
   },
 };
 

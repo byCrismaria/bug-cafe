@@ -3,26 +3,36 @@ const knexConfig = require('../../knexfile');
 const db = knex(knexConfig.development);
 const { updateUserPoints } = require('./profileService'); // Importa a função de atualização de pontos
 
-const checkoutOrder = async (userId, orderId) => {
+const checkoutOrder = async (userId, cartId) => {
     return db.transaction(async (trx) => {
-        // 1. Busca o pedido pendente do usuário
-        const order = await trx('orders')
-            .where({ user_id: userId, order_id: orderId, status: 'Pendente' })
-            .first();
-
-        if (!order) {
-            throw new Error('Pedido pendente não encontrado.');
+        // 1. Encontra o pedido pendente — por userId (logado) ou cartId (guest)
+        let order;
+        if (userId) {
+            order = await trx('orders')
+                .where({ user_id: userId, status: 'Pendente' })
+                .orderBy('order_date', 'desc')
+                .first();
+        } else {
+            order = await trx('orders')
+                .where({ user_id: null, cart_id: cartId, status: 'Pendente' })
+                .orderBy('order_date', 'desc')
+                .first();
         }
 
-        // 2. Atualiza o status do pedido para 'Concluído'
+        if (!order) {
+            throw new Error('Nenhum pedido pendente encontrado. Adicione itens ao carrinho.');
+        }
+
+        // 2. Atualiza o status para 'Concluido' (simula pagamento aprovado)
         await trx('orders')
-            .where({ order_id: orderId })
+            .where({ order_id: order.order_id })
             .update({ status: 'Concluido' });
 
-        // 3. Adiciona os pontos ao saldo do usuário
-        await updateUserPoints(userId, orderId);
-        
-        // 4. Retorna o pedido atualizado (opcional, mas bom para feedback)
+        // 3. Pontos de fidelidade apenas para usuários logados
+        if (userId) {
+            await updateUserPoints(userId, order.order_id);
+        }
+
         return {
             order_id: order.order_id,
             total_price: parseFloat(order.total_price),

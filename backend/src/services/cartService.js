@@ -49,16 +49,32 @@ const addClassicCoffeeToCart = async (productId, quantity = 1, userId, cartId) =
         // 2. Reutiliza a função findOrCreateOrder para encontrar ou criar o carrinho (tabela orders)
         const order = await findOrCreateOrder(trx, userId, cartId);
 
-        // 3. Adicionar o item ao carrinho (tabela order_items)
-        const orderItem = {
-            order_id: order.order_id,
-            product_id: productId,
-            quantity: quantity,
-            unit_price: product.price,
-            subtotal: product.price * quantity // RF30
-        };
+        // 3. Verificar se o mesmo produto já existe no carrinho
+        const existingItem = await trx('order_items')
+            .where({ order_id: order.order_id, product_id: productId })
+            .first();
 
-        const [orderItemId] = await trx('order_items').insert(orderItem).returning('order_item_id');
+        let orderItemId;
+
+        if (existingItem) {
+            // Incrementa a quantidade e recalcula o subtotal
+            const newQuantity = existingItem.quantity + quantity;
+            const newSubtotal = parseFloat(existingItem.unit_price) * newQuantity;
+            await trx('order_items')
+                .where({ order_item_id: existingItem.order_item_id })
+                .update({ quantity: newQuantity, subtotal: newSubtotal });
+            orderItemId = existingItem.order_item_id;
+        } else {
+            // Adicionar o item ao carrinho (tabela order_items)
+            const orderItem = {
+                order_id: order.order_id,
+                product_id: productId,
+                quantity: quantity,
+                unit_price: product.price,
+                subtotal: product.price * quantity // RF30
+            };
+            [orderItemId] = await trx('order_items').insert(orderItem).returning('order_item_id');
+        }
 
         // 4. Atualizar o estoque (RF06)
         await trx('products').where({ product_id: productId }).decrement('stock_quantity', quantity);

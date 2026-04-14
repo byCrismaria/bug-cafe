@@ -60,29 +60,59 @@ const addCustomCoffeeToCart = async (userId, cartId, customizationIds) => {
 
         console.log(`Preço final calculado: ${totalPrice}`);
 
-        // 4. Adiciona o item ao carrinho (tabela order_items)
-        const orderItem = {
-            order_id: order.order_id,
-            product_id: customCoffeeProduct.product_id, // ID do 'Café Personalizado' encontrado dinamicamente
-            quantity: 1,
-            unit_price: totalPrice,
-            subtotal: totalPrice
-        };
-        const [orderItemId] = await trx('order_items').insert(orderItem).returning('*');
+        // 4. Verificar se já existe um café personalizado idêntico no carrinho
+        const sortedNewIds = [...customizationIds].sort().join(',');
 
-        // 5. Adiciona as personalizações (tabela order_item_customizations)
-        const customizationsToInsert = customizationIds.map(id => ({
-            order_item_id: orderItemId.order_item_id,
-            option_id: id
-        }));
-        await trx('order_item_customizations').insert(customizationsToInsert);
+        const existingCustomItems = await trx('order_items')
+            .where({ order_id: order.order_id, product_id: customCoffeeProduct.product_id });
+
+        let matchedItem = null;
+        for (const item of existingCustomItems) {
+            const existingOptionIds = await trx('order_item_customizations')
+                .where({ order_item_id: item.order_item_id })
+                .pluck('option_id');
+            if (existingOptionIds.sort().join(',') === sortedNewIds) {
+                matchedItem = item;
+                break;
+            }
+        }
+
+        let resultItemId;
+
+        if (matchedItem) {
+            // Incrementa a quantidade e recalcula o subtotal
+            const newQuantity = matchedItem.quantity + 1;
+            const newSubtotal = parseFloat(matchedItem.unit_price) * newQuantity;
+            await trx('order_items')
+                .where({ order_item_id: matchedItem.order_item_id })
+                .update({ quantity: newQuantity, subtotal: newSubtotal });
+            resultItemId = matchedItem.order_item_id;
+        } else {
+            // Adiciona o item ao carrinho (tabela order_items)
+            const orderItem = {
+                order_id: order.order_id,
+                product_id: customCoffeeProduct.product_id,
+                quantity: 1,
+                unit_price: totalPrice,
+                subtotal: totalPrice
+            };
+            const [inserted] = await trx('order_items').insert(orderItem).returning('*');
+            resultItemId = inserted.order_item_id;
+
+            // Adiciona as personalizações (tabela order_item_customizations)
+            const customizationsToInsert = customizationIds.map(id => ({
+                order_item_id: resultItemId,
+                option_id: id
+            }));
+            await trx('order_item_customizations').insert(customizationsToInsert);
+        }
 
         // 6. Atualiza o preço total do pedido
         const newTotal = await trx('order_items').sum('subtotal as total').where({ order_id: order.order_id }).first();
         await trx('orders').where({ order_id: order.order_id }).update({ total_price: newTotal.total });
 
         return {
-            item_id: orderItemId.order_item_id
+            item_id: resultItemId
         };
     });
 };

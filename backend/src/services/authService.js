@@ -3,6 +3,8 @@ const knexConfig = require('../../knexfile');
 const db = knex(knexConfig.development);
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendPasswordResetEmail } = require('./emailService');
 
 require('dotenv').config();
 
@@ -33,14 +35,17 @@ const registerUser = async (name, email, password, confirmPassword) => {
     const hashedPassword = await bcrypt.hash(password, 10); // O '10' é o "salt", um fator de segurança
 
     // 5. Inserção do novo usuário no banco de dados (RF47)
-    const [userId] = await db('users').insert({
+    const [newUser] = await db('users').insert({
         full_name: name,
         email,
         password_hash: hashedPassword,
         points_balance: 0 // Inicializa o saldo de pontos como 0
     }).returning('user_id');
 
-    return { userId };
+    // Knex + PostgreSQL retorna [{ user_id: 1 }], não [1]
+    const userId = newUser.user_id ?? newUser;
+    const token = generateToken(userId);
+    return { userId, name, token };
 };
 
 const generateToken = (userId) => {
@@ -75,7 +80,54 @@ const loginUser = async (email, password) => {
     };
 };
 
+const forgotPassword = async (email) => {
+    const user = await db('users').where({ email }).first();
+
+    // Não revelamos se o e-mail existe ou não (segurança)
+    if (!user) return;
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hora
+
+    await db('users').where({ email }).update({
+        reset_token: resetToken,
+        reset_token_expires: resetTokenExpires,
+    });
+
+    await sendPasswordResetEmail(email, resetToken);
+};
+
+const resetPassword = async (token, newPassword, confirmPassword) => {
+    if (!token) throw new Error('Token não fornecido.');
+
+    if (newPassword !== confirmPassword) {
+        throw new Error('As senhas não coincidem.');
+    }
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        throw new Error('A senha deve ter no mínimo 8 caracteres, incluindo letras e números.');
+    }
+
+    const user = await db('users')
+        .where({ reset_token: token })
+        .where('reset_token_expires', '>', new Date())
+        .first();
+
+    if (!user) throw new Error('Link inválido ou expirado. Solicite um novo.');
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db('users').where({ user_id: user.user_id }).update({
+        password_hash: hashedPassword,
+        reset_token: null,
+        reset_token_expires: null,
+    });
+};
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    forgotPassword,
+    resetPassword,
 };

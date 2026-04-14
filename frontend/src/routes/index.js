@@ -8,6 +8,7 @@ import AuthProfile from '../views/AuthProfile.vue';
 import AboutView from '../views/AboutView.vue';
 import TermsOfServiceView from '../views/TermsOfServiceView.vue';
 import ContactView from '../views/ContactView.vue';
+import ResetPasswordView from '../views/ResetPasswordView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,7 +56,21 @@ const router = createRouter({
       name: 'Contact',
       component: ContactView
     },
+    {
+      path: '/reset-senha',
+      name: 'ResetPassword',
+      component: ResetPasswordView
+    },
   ]
+});
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('authToken');
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login-cadastro');
+  } else {
+    next();
+  }
 });
 
 export default router;

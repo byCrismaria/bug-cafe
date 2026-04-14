@@ -4,12 +4,17 @@ const register = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
 
     try {
-        await authService.registerUser(name, email, password, confirmPassword);
-        
+        const result = await authService.registerUser(name, email, password, confirmPassword);
+
         // Retorna mensagem de sucesso (RF49)
-        res.status(201).json({ 
-            status: "success", 
-            message: "Cadastro realizado com sucesso. Bem-vindo(a)!" 
+        res.status(201).json({
+            status: "success",
+            message: "Cadastro realizado com sucesso. Bem-vindo(a)!",
+            data: {
+                userId: result.userId,
+                name: result.name,
+                token: result.token
+            }
         });
     } catch (error) {
         let errorMessage;
@@ -61,7 +66,42 @@ const login = async (req, res) => {
     }
 };
 
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ status: 'error', message: 'E-mail é obrigatório.' });
+    }
+
+    try {
+        await authService.forgotPassword(email);
+        res.status(200).json({
+            status: 'success',
+            message: 'Se o e-mail estiver cadastrado, você receberá as instruções em breve.',
+        });
+    } catch (error) {
+        console.error('Erro no forgot password:', error);
+        res.status(500).json({ status: 'error', message: 'Erro ao processar a solicitação.' });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    const { token, password, confirmPassword } = req.body;
+
+    try {
+        await authService.resetPassword(token, password, confirmPassword);
+        res.status(200).json({
+            status: 'success',
+            message: 'Senha redefinida com sucesso! Você já pode fazer login.',
+        });
+    } catch (error) {
+        res.status(400).json({ status: 'error', message: error.message });
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    forgotPassword,
+    resetPassword,
 };

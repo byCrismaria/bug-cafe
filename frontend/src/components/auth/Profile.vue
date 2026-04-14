@@ -157,6 +157,7 @@ onMounted(() => {
         orders.value = response.data.data.orderHistory;
       }
     } catch (error) {
+      console.error('Erro ao carregar perfil:', error);
       user.value.name = 'Erro ao carregar';
       user.value.email = '';
       user.value.points = 0;

@@ -48,9 +48,7 @@
 
               <div class="text-subtitle-2 text-medium-emphasis d-flex align-center justify-space-between mb-2">
                 Password
-                <a class="text-caption text-decoration-none text-amber-darken-3" href="#" rel="noopener noreferrer">
-                  Esqueceu sua senha?
-                </a>
+                <ForgotPassword />
               </div>
 
               <v-text-field v-model="loginData.password" :append-inner-icon="showPass.login ? 'mdi-eye-off' : 'mdi-eye'"
@@ -124,8 +122,11 @@
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import apiService from '../../services/apiService.js';
+import { useAuth } from '../../composables/useAuth.js';
+import ForgotPassword from './ForgotPassword.vue';
 
 const router = useRouter();
+const { setAuth } = useAuth();
 const loginForm = ref(null);
 const registerForm = ref(null);
 
@@ -187,17 +188,12 @@ const handleLogin = async () => {
     const result = await apiService.login(loginData.email, loginData.password);
 
     if (result.status === 'success' && result.data) {
-      const token = result.data.token;
       const message = result.message || 'Login realizado com sucesso.';
 
-      // Salva o token
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userName', result.data.name);
+      setAuth(result.data.token, result.data.name);
+      localStorage.removeItem('cartId');
 
       showSnackbar(message, 'success');
-
-      // Limpa o cartId local
-      localStorage.removeItem('cartId');
 
       // Redireciona para a página de perfil
       router.push('/profile');
@@ -239,22 +235,14 @@ const handleRegister = async () => {
 
     console.log('Resposta do registro:', result);
 
-    if (result.status === 'success') {
-      const message = result.message || 'Cadastro realizado com sucesso. Bem-vindo(a)!';
+    if (result.status === 'success' && result.data) {
+      setAuth(result.data.token, result.data.name);
+      localStorage.removeItem('cartId');
 
-      showSnackbar(message, 'success');
+      showSnackbar(result.message || 'Cadastro realizado com sucesso. Bem-vindo(a)!', 'success');
 
-      // Limpa o formulário de registro
-      registerData.fullName = '';
-      registerData.email = '';
-      registerData.password = '';
-      registerData.confirmPassword = '';
-      registerData.receiveNews = false;
-
-      // Foca no formulário de login
       setTimeout(() => {
-        loginData.email = registerData.email;
-        if (registerForm.value) registerForm.value.reset();
+        router.push('/profile');
       }, 1000);
 
     } else {

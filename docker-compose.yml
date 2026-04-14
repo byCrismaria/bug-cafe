@@ -43,6 +43,8 @@ services:
       # Mapeia a pasta local pro contêiner pra funcionar o live reload
       - ./frontend:/app
       - /app/node_modules
+    environment:
+      VITE_API_TARGET: http://backend:3000
     depends_on:
       - backend
       # Comando pra iniciar o servidor de desenvolvimento do frontend

@@ -2,10 +2,10 @@
   <v-container class="py-12" fluid>
     <v-responsive class="mx-auto" max-width="1200">
 
-      <v-alert v-if="isLoading" type="info" variant="tonal" class="mb-4">
+      <v-alert v-if="isLoading" type="info" variant="tonal" class="mb-4" data-testid="build-coffee-loading">
         Carregando opções de customização...
       </v-alert>
-      <v-alert v-if="fetchError" type="error" variant="tonal" class="mb-4">
+      <v-alert v-if="fetchError" type="error" variant="tonal" class="mb-4" data-testid="build-coffee-error">
         Erro ao carregar opções. Tente novamente mais tarde.
       </v-alert>
 
@@ -13,24 +13,24 @@
         <v-col cols="12" md="6">
           <v-card elevation="5" rounded="xl" class="pa-6 pa-md-8">
 
-            <h2 class="text-h6 font-weight-semibold text-primary mb-4">1. Escolha sua Base</h2>
-            <v-radio-group v-model="selectedBase" mandatory class="mb-6">
+            <h2 class="text-h6 font-weight-semibold text-primary mb-4" data-testid="build-coffee-base-title">1. Escolha sua Base</h2>
+            <v-radio-group v-model="selectedBase" mandatory class="mb-6" data-testid="build-coffee-base-group">
               <v-row>
                 <v-col v-for="base in baseOptions" :key="base.value" cols="auto" class="py-0">
                   <v-radio :label="`${base.label} (${formatPrice(base.price)})`" :value="base.value"
-                    color="#b45309"></v-radio>
+                    color="#b45309" :data-testid="`build-coffee-base-${base.value}`"></v-radio>
                 </v-col>
               </v-row>
             </v-radio-group>
 
             <v-divider class="my-6"></v-divider>
 
-            <h2 class="text-h6 font-weight-semibold text-primary mb-4">2. Escolha o Tamanho</h2>
-            <v-radio-group v-model="selectedSize" mandatory class="mb-6">
+            <h2 class="text-h6 font-weight-semibold text-primary mb-4" data-testid="build-coffee-size-title">2. Escolha o Tamanho</h2>
+            <v-radio-group v-model="selectedSize" mandatory class="mb-6" data-testid="build-coffee-size-group">
               <v-row>
                 <v-col v-for="size in sizeOptions" :key="size.value" cols="auto" class="py-0">
                   <v-radio :label="`${size.label} ${size.price > 0 ? formatPrice(size.price, true) : ''}`"
-                    :value="size.value" color="#b45309"></v-radio>
+                    :value="size.value" color="#b45309" :data-testid="`build-coffee-size-${size.value}`"></v-radio>
                 </v-col>
               </v-row>
             </v-radio-group>
@@ -39,18 +39,18 @@
 
             <v-row>
               <v-col cols="12" sm="6">
-                <h2 class="text-h6 font-weight-semibold text-primary mb-4">3. Adicione Sabores</h2>
+                <h2 class="text-h6 font-weight-semibold text-primary mb-4" data-testid="build-coffee-flavor-title">3. Adicione Sabores</h2>
                 <v-checkbox v-for="flavor in flavorOptions" :key="flavor.value" v-model="selectedFlavors"
                   :label="`${flavor.label} ${formatPrice(flavor.price, true)}`" :value="flavor.value" color="#b45309"
-                  density="compact" hide-details></v-checkbox>
+                  density="compact" hide-details :data-testid="`build-coffee-flavor-${flavor.value}`"></v-checkbox>
               </v-col>
 
               <v-col cols="12" sm="6">
-                <h2 class="text-h6 font-weight-semibold text-primary mb-4">4. Leite e Outros Extras</h2>
-                <v-radio-group v-model="selectedExtra" mandatory class="mt-0 pt-0">
+                <h2 class="text-h6 font-weight-semibold text-primary mb-4" data-testid="build-coffee-extra-title">4. Leite e Outros Extras</h2>
+                <v-radio-group v-model="selectedExtra" mandatory class="mt-0 pt-0" data-testid="build-coffee-extra-group">
                   <v-radio v-for="extra in extraOptions" :key="extra.value"
                     :label="`${extra.label} ${extra.price > 0 ? formatPrice(extra.price, true) : ''}`"
-                    :value="extra.value" color="#b45309" density="compact" hide-details></v-radio>
+                    :value="extra.value" color="#b45309" density="compact" hide-details :data-testid="`build-coffee-extra-${extra.value}`"></v-radio>
                 </v-radio-group>
               </v-col>
             </v-row>
@@ -58,8 +58,8 @@
         </v-col>
 
         <v-col cols="12" md="5">
-          <v-card elevation="5" rounded="xl" class="pa-6 pa-md-8 d-flex flex-column" height="100%">
-            <h2 class="text-h6 font-weight-semibold text-primary mb-6">Resumo do Pedido</h2>
+          <v-card elevation="5" rounded="xl" class="pa-6 pa-md-8 d-flex flex-column" height="100%" data-testid="build-coffee-summary-card">
+            <h2 class="text-h6 font-weight-semibold text-primary mb-6" data-testid="build-coffee-summary-title">Resumo do Pedido</h2>
 
             <div class="flex-grow-1 mb-8">
               <v-list density="compact" class="bg-transparent">
@@ -86,10 +86,10 @@
             <div class="mt-auto pt-6 border-t border-grey-lighten-2">
               <div class="d-flex justify-space-between align-center text-h5 font-weight-bold text-primary mb-4">
                 <span>TOTAL</span>
-                <span id="order-total">{{ formatPrice(currentPrice) }}</span>
+                <span id="order-total" data-testid="build-coffee-total">{{ formatPrice(currentPrice) }}</span>
               </div>
               <v-btn block size="large" color="#b45309" class="font-weight-bold text-white"
-                :disabled="!selectedBase || !selectedSize" @click="addCustomCoffee">
+                :disabled="!selectedBase || !selectedSize" @click="addCustomCoffee" data-testid="build-coffee-add-button">
                 Adicionar ao Carrinho
               </v-btn>
             </div>

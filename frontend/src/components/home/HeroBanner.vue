@@ -1,5 +1,5 @@
 <template>
-  <section id="inicio">
+  <section id="inicio" data-testid="hero-section">
     <v-carousel
       :height="$vuetify.display.smAndDown ? 300 : 450"
       show-arrows="hover"
@@ -7,22 +7,25 @@
       hide-delimiter-background
       :continuous="true"
       class="text-center"
+      data-testid="hero-carousel"
     >
       <v-carousel-item
         v-for="(slide, i) in slides"
         :key="i"
+        :data-testid="`hero-slide-${i}`"
       >
-        <v-img 
-          :src="slide.image" 
-          height="100%" 
-          cover 
+        <v-img
+          :src="slide.image"
+          height="100%"
+          cover
           class="d-flex align-center justify-center text-white"
+          :data-testid="`hero-image-${i}`"
         >
           <div class="v-overlay-scrim"></div>
-          
+
           <div class="relative z-10 px-4">
-            <h1 class="text-h3 text-md-h3 font-weight-black">{{ slide.title }}</h1>
-            <p class="mt-4 text-subtitle-1 text-md-h6 drop-shadow-lg">{{ slide.subtitle }}</p>
+            <h1 class="text-h3 text-md-h3 font-weight-black" :data-testid="`hero-title-${i}`">{{ slide.title }}</h1>
+            <p class="mt-4 text-subtitle-1 text-md-h6 drop-shadow-lg" :data-testid="`hero-subtitle-${i}`">{{ slide.subtitle }}</p>
           </div>
         </v-img>
       </v-carousel-item>

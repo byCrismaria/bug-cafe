@@ -1,35 +1,35 @@
 <template>
-  <v-footer class="py-8 mt-14" color="grey-darken-3" :absolute="false">
+  <v-footer class="py-8 mt-14" color="grey-darken-3" :absolute="false" data-testid="app-footer">
     <v-container>
       <div class="d-flex flex-column flex-md-row justify-space-between align-center w-100">
 
         <div class="mb-4 mb-md-0">
           <ul class="d-flex text-subtitle-1">
             <li class="list-item mx-3">
-              <router-link to="/about" class="text-white text-decoration-none hover-link">Sobre Nós</router-link>
+              <router-link to="/about" class="text-white text-decoration-none hover-link" data-testid="footer-link-about">Sobre Nós</router-link>
             </li>
             <li class="list-item mx-3">
-              <router-link to="/contact" class="text-white text-decoration-none hover-link">Contato</router-link>
+              <router-link to="/contact" class="text-white text-decoration-none hover-link" data-testid="footer-link-contact">Contato</router-link>
             </li>
             <li class="list-item mx-3">
-              <router-link to="/terms" class="text-white text-decoration-none hover-link">Termos de Serviço</router-link>
+              <router-link to="/terms" class="text-white text-decoration-none hover-link" data-testid="footer-link-terms">Termos de Serviço</router-link>
             </li>
           </ul>
         </div>
 
         <div class="d-flex">
-          <v-btn icon variant="plain" href="#" class="text-grey-lighten-2 mx-2">
+          <v-btn icon variant="plain" href="#" class="text-grey-lighten-2 mx-2" data-testid="footer-social-instagram">
             <v-icon size="24">mdi-instagram</v-icon>
           </v-btn>
 
-          <v-btn icon variant="plain" href="#" class="text-grey-lighten-2 mx-2">
+          <v-btn icon variant="plain" href="#" class="text-grey-lighten-2 mx-2" data-testid="footer-social-twitter">
             <v-icon size="24">mdi-twitter</v-icon>
           </v-btn>
 
         </div>
       </div>
 
-      <div class="text-center text-caption mt-6 text-grey-lighten-1">
+      <div class="text-center text-caption mt-6 text-grey-lighten-1" data-testid="footer-copyright">
         © {{ new Date().getFullYear() }} Bug Café. Todos os direitos reservados.
       </div>
 

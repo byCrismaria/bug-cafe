@@ -1,9 +1,9 @@
 <template>
-  <v-container class="py-8">
-    <v-overlay :model-value="isLoading.login" class="d-flex align-center justify-center" persistent>
+  <v-container class="py-8" data-testid="auth-page">
+    <v-overlay :model-value="isLoading.login" class="d-flex align-center justify-center" persistent data-testid="auth-loading-overlay">
       <v-progress-circular indeterminate color="#b45309" size="64" />
     </v-overlay>
-    <v-card class="mx-auto pa-8" elevation="8" max-width="1200" rounded="lg">
+    <v-card class="mx-auto pa-8" elevation="8" max-width="1200" rounded="lg" data-testid="auth-card">
       <v-row>
         <!-- Coluna de Boas-vindas -->
         <v-col cols="12" md="4" class="pr-md-4">
@@ -37,14 +37,14 @@
         <!-- Coluna de Login -->
         <v-col cols="12" md="4" class="px-md-2">
           <v-card variant="flat" color="grey-lighten-5" class="pa-4 rounded-lg h-100">
-            <h3 class="text-h6 font-weight-semibold mb-4 text-brown-darken-3">
+            <h3 class="text-h6 font-weight-semibold mb-4 text-brown-darken-3" data-testid="login-title">
               Login
             </h3>
 
-            <v-form @submit.prevent="handleLogin" ref="loginForm">
+            <v-form @submit.prevent="handleLogin" ref="loginForm" data-testid="login-form">
               <v-text-field v-model="loginData.email" density="compact" placeholder="Email address"
                 prepend-inner-icon="mdi-email-outline" variant="outlined" color="amber-darken-3"
-                :rules="[rules.required, rules.email]" class="mb-3"></v-text-field>
+                :rules="[rules.required, rules.email]" class="mb-3" data-testid="login-email-input"></v-text-field>
 
               <div class="text-subtitle-2 text-medium-emphasis d-flex align-center justify-space-between mb-2">
                 Password
@@ -55,10 +55,10 @@
                 :type="showPass.login ? 'text' : 'password'" density="compact" placeholder="Enter your password"
                 prepend-inner-icon="mdi-lock-outline" variant="outlined" color="amber-darken-3"
                 :rules="[rules.required]" @click:append-inner="showPass.login = !showPass.login"
-                class="mb-4"></v-text-field>
+                class="mb-4" data-testid="login-password-input"></v-text-field>
 
               <v-btn type="submit" color="#b45309" size="large" variant="flat" block :loading="isLoading.login"
-                class="text-white font-weight-bold">
+                class="text-white font-weight-bold" data-testid="login-submit-button">
                 Entrar
               </v-btn>
             </v-form>
@@ -68,38 +68,38 @@
         <!-- Coluna de Cadastro -->
         <v-col cols="12" md="4" class="pl-md-4">
           <v-card variant="flat" color="grey-lighten-5" class="pa-4 rounded-lg h-100">
-            <h3 class="text-h6 font-weight-semibold mb-4 text-brown-darken-3">
+            <h3 class="text-h6 font-weight-semibold mb-4 text-brown-darken-3" data-testid="register-title">
               Cadastro
             </h3>
 
-            <v-form @submit.prevent="handleRegister" ref="registerForm">
+            <v-form @submit.prevent="handleRegister" ref="registerForm" data-testid="register-form">
               <v-text-field v-model="registerData.fullName" density="compact" placeholder="Nome completo"
                 prepend-inner-icon="mdi-account-outline" variant="outlined" color="amber-darken-3"
-                :rules="[rules.required]" class="mb-3"></v-text-field>
+                :rules="[rules.required]" class="mb-3" data-testid="register-name-input"></v-text-field>
 
               <v-text-field v-model="registerData.email" density="compact" placeholder="Email address"
                 prepend-inner-icon="mdi-email-outline" variant="outlined" color="amber-darken-3"
-                :rules="[rules.required, rules.email]" class="mb-3"></v-text-field>
+                :rules="[rules.required, rules.email]" class="mb-3" data-testid="register-email-input"></v-text-field>
 
               <v-text-field v-model="registerData.password"
                 :append-inner-icon="showPass.register ? 'mdi-eye-off' : 'mdi-eye'"
                 :type="showPass.register ? 'text' : 'password'" density="compact" placeholder="Password"
                 prepend-inner-icon="mdi-lock-outline" variant="outlined" color="amber-darken-3"
                 :rules="[rules.required, rules.min, rules.passwordSecurity]"
-                @click:append-inner="showPass.register = !showPass.register" class="mb-3"></v-text-field>
+                @click:append-inner="showPass.register = !showPass.register" class="mb-3" data-testid="register-password-input"></v-text-field>
 
               <v-text-field v-model="registerData.confirmPassword"
                 :append-inner-icon="showPass.confirm ? 'mdi-eye-off' : 'mdi-eye'"
                 :type="showPass.confirm ? 'text' : 'password'" density="compact" placeholder="Confirm password"
                 prepend-inner-icon="mdi-lock-check-outline" variant="outlined" color="amber-darken-3"
                 :rules="[rules.required, rules.passwordMatch]"
-                @click:append-inner="showPass.confirm = !showPass.confirm" class="mb-4"></v-text-field>
+                @click:append-inner="showPass.confirm = !showPass.confirm" class="mb-4" data-testid="register-confirm-password-input"></v-text-field>
 
               <v-checkbox v-model="registerData.receiveNews" label="Aceito receber novidades e promoções"
-                density="compact" color="#b45309" class="mt-0"></v-checkbox>
+                density="compact" color="#b45309" class="mt-0" data-testid="register-news-checkbox"></v-checkbox>
 
               <v-btn type="submit" color="#b45309" size="large" variant="flat" block :loading="isLoading.register"
-                class="text-white font-weight-bold">
+                class="text-white font-weight-bold" data-testid="register-submit-button">
                 Cadastrar
               </v-btn>
             </v-form>

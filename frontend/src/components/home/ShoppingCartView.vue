@@ -1,32 +1,33 @@
 <template>
-  <v-responsive class="mx-auto" max-width="1200">
-    <v-card elevation="5" rounded="xl" class="pa-6 pa-md-8">
-      <h2 class="text-h4 font-weight-bold text-brown-darken-3 mb-2">Seu Carrinho</h2>
+  <v-responsive class="mx-auto" max-width="1200" data-testid="shopping-cart-page">
+    <v-card elevation="5" rounded="xl" class="pa-6 pa-md-8" data-testid="shopping-cart-card">
+      <h2 class="text-h4 font-weight-bold text-brown-darken-3 mb-2" data-testid="shopping-cart-title">Seu Carrinho</h2>
 
       <v-divider class="mb-2"></v-divider>
 
-      <div v-if="isLoading" class="text-center py-10">
+      <div v-if="isLoading" class="text-center py-10" data-testid="shopping-cart-loading">
         <v-progress-circular indeterminate color="amber-darken-3"></v-progress-circular>
         <p class="text-subtitle-1 mt-4 text-grey-darken-1">Carregando seu carrinho...</p>
       </div>
 
       <!-- Lista de Itens do Carrinho -->
-      <div v-else-if="cartData.items.length > 0">
+      <div v-else-if="cartData.items.length > 0" data-testid="shopping-cart-items-list">
         <div v-for="item in cartData.items" :key="item.itemId"
-          class="d-flex flex-column flex-md-row align-start align-md-center justify-space-between pb-4 border-b">
+          class="d-flex flex-column flex-md-row align-start align-md-center justify-space-between pb-4 border-b"
+          :data-testid="`cart-item-${item.itemId}`">
           <!-- Detalhes do Item e Imagem (Lado Esquerdo) -->
           <div class="d-flex align-center ga-4 w-100 w-md-50 mb-6 mb-md-0">
             <v-img :src="item.image || getPlaceholderImage(item.name)" :alt="item.name" cover width="80" height="80"
-              class="rounded-lg flex-shrink-0" />
+              class="rounded-lg flex-shrink-0" :data-testid="`cart-item-image-${item.itemId}`" />
 
             <div class="flex-grow-1 mr-4 pa-6">
-              <div class="text-subtitle-1 font-weight-bold text-grey-darken-4">{{ item.name }}</div>
+              <div class="text-subtitle-1 font-weight-bold text-grey-darken-4" :data-testid="`cart-item-name-${item.itemId}`">{{ item.name }}</div>
               <div v-if="item.is_customizable && item.customizations && item.customizations.length"
-                class="text-caption text-grey-darken-1 mt-1">
+                class="text-caption text-grey-darken-1 mt-1" :data-testid="`cart-item-customizations-${item.itemId}`">
                 <span v-for="(custom, idx) in item.customizations" :key="idx" class="mr-1">
                   {{ custom.name }} ({{ custom.category }}){{ idx < item.customizations.length - 1 ? ',' : '' }} </span>
               </div>
-              <p v-else-if="item.description" class="text-caption text-grey-darken-1 mt-1">{{ item.description }}</p>
+              <p v-else-if="item.description" class="text-caption text-grey-darken-1 mt-1" :data-testid="`cart-item-description-${item.itemId}`">{{ item.description }}</p>
 
 
               <!-- Preço Unitário (Mobile/Tablet) -->
@@ -40,7 +41,7 @@
             <!-- Preço Unitário (Desktop) -->
             <div class="d-none d-md-flex flex-column align-center ml-auto mr-8">
               <span class="text-caption text-grey-darken-1">Preço Unitário:</span>
-              <span class="text-subtitle-1 font-weight-bold text-grey-darken-4">{{ formatPrice(item.unit_price)
+              <span class="text-subtitle-1 font-weight-bold text-grey-darken-4" :data-testid="`cart-item-unit-price-${item.itemId}`">{{ formatPrice(item.unit_price)
               }}</span>
             </div>
           </div>
@@ -54,53 +55,53 @@
             <!-- Controles de Quantidade -->
             <div class="d-flex align-center border rounded-xl overflow-hidden mr-4">
               <v-btn size="small" icon="mdi-minus" variant="flat" color="grey-lighten-3"
-                @click="updateCartItemQuantity(item.order_item_id, - 1)" />
-              <span class="px-3 text-subtitle-1 font-weight-medium text-center" style="min-width: 40px;">
+                @click="updateCartItemQuantity(item.order_item_id, - 1)" :data-testid="`cart-item-decrease-${item.itemId}`" />
+              <span class="px-3 text-subtitle-1 font-weight-medium text-center" style="min-width: 40px;" :data-testid="`cart-item-quantity-${item.itemId}`">
                 {{ item.quantity }}
               </span>
               <v-btn size="small" icon="mdi-plus" variant="flat" color="grey-lighten-3"
-                @click="updateCartItemQuantity(item.order_item_id, + 1)" />
+                @click="updateCartItemQuantity(item.order_item_id, + 1)" :data-testid="`cart-item-increase-${item.itemId}`" />
             </div>
 
             <!-- Subtotal do Item -->
-            <span class="text-h6 font-weight-bold text-amber-darken-3 mr-4" style="min-width: 70px;">
+            <span class="text-h6 font-weight-bold text-amber-darken-3 mr-4" style="min-width: 70px;" :data-testid="`cart-item-subtotal-${item.itemId}`">
               {{ formatPrice(item.subtotal) }}
             </span>
 
             <!-- Botão de Remover -->
             <v-btn icon="mdi-trash-can-outline" variant="plain" color="red-darken-2"
-              @click="removeItem(item.order_item_id)" :disabled="item.isUpdating" :loading="item.isUpdating" />
+              @click="removeItem(item.order_item_id)" :disabled="item.isUpdating" :loading="item.isUpdating" :data-testid="`cart-item-remove-${item.itemId}`" />
           </div>
 
         </div>
       </div>
 
       <!-- Carrinho Vazio -->
-      <div v-else class="text-center py-10">
+      <div v-else class="text-center py-10" data-testid="shopping-cart-empty">
         <v-icon size="60" color="grey-lighten-1" class="mb-4">mdi-coffee-off</v-icon>
-        <h3 class="text-h6 text-grey-darken-1">Seu carrinho está vazio. Adicione um café!</h3>
-        <v-btn to="/" color="amber-darken-3" variant="flat" class="mt-4" size="large" rounded="xl">
+        <h3 class="text-h6 text-grey-darken-1" data-testid="shopping-cart-empty-message">Seu carrinho está vazio. Adicione um café!</h3>
+        <v-btn to="/" color="amber-darken-3" variant="flat" class="mt-4" size="large" rounded="xl" data-testid="shopping-cart-back-to-shop">
           Voltar à Loja
         </v-btn>
       </div>
 
       <!-- Rodapé e Sumário (Visível se houver itens) -->
-      <div v-if="cartData.items.length > 0" class="d-flex flex-column flex-md-row justify-end mt-8">
+      <div v-if="cartData.items.length > 0" class="d-flex flex-column flex-md-row justify-end mt-8" data-testid="shopping-cart-summary">
         <!-- Coluna do Sumário -->
         <!-- Adicionada margem inferior mb-6 para mobile -->
         <div class="text-grey-darken-1 text-body-2 w-100 w-md-50 mb-6 mb-md-0" style="max-width: 360px;">
           <div class="d-flex justify-space-between align-center mb-2">
             <span>Subtotal do Pedido:</span>
-            <span class="font-weight-medium text-grey-darken-4">{{ formatPrice(cartData.subtotal) }}</span>
+            <span class="font-weight-medium text-grey-darken-4" data-testid="cart-subtotal">{{ formatPrice(cartData.subtotal) }}</span>
           </div>
           <div class="d-flex justify-space-between align-center mb-2">
             <span>Taxas e Impostos (Est.):</span>
-            <span class="font-weight-medium text-grey-darken-4">{{ formatPrice(cartData.taxes) }}</span>
+            <span class="font-weight-medium text-grey-darken-4" data-testid="cart-taxes">{{ formatPrice(cartData.taxes) }}</span>
           </div>
           <v-divider class="my-4"></v-divider>
           <div class="d-flex justify-space-between align-center font-weight-bold text-h6">
             <span>TOTAL:</span>
-            <span class="text-amber-darken-3">{{ formatPrice(cartData.total) }}</span>
+            <span class="text-amber-darken-3" data-testid="cart-total">{{ formatPrice(cartData.total) }}</span>
           </div>
         </div>
 
@@ -109,7 +110,7 @@
         <div class="flex-shrink-0 mt-0 ml-md-8">
           <v-btn class="text-white font-weight-medium px-6 py-3 rounded-xl elevation-4"
             color="#b45309" size="x-large" variant="flat" block @click="showCheckoutDialog = true"
-            :disabled="isCheckingOut">
+            :disabled="isCheckingOut" data-testid="cart-checkout-button">
             Continuar para Pagamento
           </v-btn>
         </div>
@@ -118,35 +119,35 @@
   </v-responsive>
 
   <!-- Dialog de Confirmação de Checkout -->
-  <v-dialog v-model="showCheckoutDialog" max-width="440" persistent>
+  <v-dialog v-model="showCheckoutDialog" max-width="440" persistent data-testid="checkout-dialog">
     <v-card rounded="lg" class="pa-2">
-      <v-card-title class="text-h6 font-weight-bold pt-4 px-6">
+      <v-card-title class="text-h6 font-weight-bold pt-4 px-6" data-testid="checkout-dialog-title">
         Confirmar Pedido
       </v-card-title>
-      <v-card-text class="px-6">
+      <v-card-text class="px-6" data-testid="checkout-dialog-message">
         Deseja finalizar o pedido no valor de <strong>{{ formatPrice(cartData.total) }}</strong>?
       </v-card-text>
       <v-card-actions class="px-6 pb-4">
         <v-spacer />
-        <v-btn variant="text" color="grey-darken-1" @click="showCheckoutDialog = false" :disabled="isCheckingOut">Cancelar</v-btn>
-        <v-btn color="#b45309" variant="flat" class="text-white" @click="checkout" :loading="isCheckingOut">Confirmar</v-btn>
+        <v-btn variant="text" color="grey-darken-1" @click="showCheckoutDialog = false" :disabled="isCheckingOut" data-testid="checkout-dialog-cancel">Cancelar</v-btn>
+        <v-btn color="#b45309" variant="flat" class="text-white" @click="checkout" :loading="isCheckingOut" data-testid="checkout-dialog-confirm">Confirmar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
   <!-- Dialog de Confirmação de Remoção -->
-  <v-dialog v-model="showRemoveDialog" max-width="400">
+  <v-dialog v-model="showRemoveDialog" max-width="400" data-testid="remove-item-dialog">
     <v-card rounded="lg" class="pa-2">
-      <v-card-title class="text-h6 font-weight-bold pt-4 px-6">
+      <v-card-title class="text-h6 font-weight-bold pt-4 px-6" data-testid="remove-item-dialog-title">
         Remover item
       </v-card-title>
-      <v-card-text class="px-6">
+      <v-card-text class="px-6" data-testid="remove-item-dialog-message">
         Deseja remover este item do carrinho?
       </v-card-text>
       <v-card-actions class="px-6 pb-4">
         <v-spacer />
-        <v-btn variant="text" color="grey-darken-1" @click="showRemoveDialog = false">Cancelar</v-btn>
-        <v-btn color="red-darken-2" variant="flat" class="text-white" @click="confirmRemoveItem">Remover</v-btn>
+        <v-btn variant="text" color="grey-darken-1" @click="showRemoveDialog = false" data-testid="remove-item-dialog-cancel">Cancelar</v-btn>
+        <v-btn color="red-darken-2" variant="flat" class="text-white" @click="confirmRemoveItem" data-testid="remove-item-dialog-confirm">Remover</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

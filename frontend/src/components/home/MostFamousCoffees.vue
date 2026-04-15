@@ -2,44 +2,47 @@
   <v-slide-group
     class="pa-2"
     show-arrows
+    data-testid="famous-coffees-slide-group"
   >
     <v-slide-group-item
-      v-for="coffee in mostFamous"
+      v-for="(coffee, index) in mostFamous"
       :key="coffee.name"
     >
       <v-card
         elevation="5"
         class="ma-3 overflow-hidden d-flex flex-row justify-space-between"
-        width="500" 
-        min-width="280"        
+        width="500"
+        min-width="280"
         variant="flat"
-
+        :data-testid="`famous-coffee-card-${index}`"
       >
-        <v-img 
-          :src="coffee.image || getPlaceholderImage(coffee.name, { width: 200, height: 200, bgColor: '6D4C41' })" 
-          :alt="coffee.name" 
-          width="150" 
+        <v-img
+          :src="coffee.image || getPlaceholderImage(coffee.name, { width: 200, height: 200, bgColor: '6D4C41' })"
+          :alt="coffee.name"
+          width="150"
           class="flex-shrink-0"
-          cover 
-          />
-        
+          cover
+          :data-testid="`famous-coffee-image-${index}`"
+        />
+
         <div class="pa-4 flex-grow-1 d-flex flex-column justify-space-between">
           <div>
-            <div class="text-h6 font-weight-bold mb-2">{{ coffee.name }}</div>
-            <div class="text-caption text-grey-darken-1 mb-4">{{ coffee.description }}</div>
+            <div class="text-h6 font-weight-bold mb-2" :data-testid="`famous-coffee-name-${index}`">{{ coffee.name }}</div>
+            <div class="text-caption text-grey-darken-1 mb-4" :data-testid="`famous-coffee-description-${index}`">{{ coffee.description }}</div>
           </div>
           <div class="mt-auto">
-            <v-btn 
-            block 
-            color="#b45309" 
+            <v-btn
+            block
+            color="#b45309"
             class="mt-2"
             height="40"
             @click.stop="addToCart(coffee.id)"
             :loading="loadingId === coffee.id"
             :disabled="loadingId === coffee.id"
+            :data-testid="`famous-coffee-add-button-${index}`"
           >
             Adicionar ao Carrinho
-          </v-btn> 		
+          </v-btn>		
           </div>
         </div>
       </v-card>

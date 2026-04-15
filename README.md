@@ -10,6 +10,7 @@ Este projeto é um sistema para uma cafeteria, desenvolvendo tanto a interface d
 - [Funcionalidades](#funcionalidades)
 - [Instalação](#instalação)
 - [Execução](#execução)
+- [Documentação da API](#documentação-da-api)
 - [Testes](#testes)
 - [API Endpoints](#api-endpoints)
 - [Sistema de Pontos](#sistema-de-pontos)
@@ -39,6 +40,7 @@ O Bug Café é uma aplicação full-stack composta por:
 - PostgreSQL
 - Knex.js (Query Builder)
 - JWT (JSON Web Tokens)
+- Swagger (swagger-ui-express, swagger-jsdoc) - Documentação da API
 
 ## Estrutura do Projeto
 
@@ -79,9 +81,12 @@ bug-cafe/
 │   └── vite.config.js
 └── backend/
     ├── src/
+    │   ├── config/              # Configurações
+    │   │   └── swagger.js       # Documentação Swagger
     │   ├── controllers/
     │   ├── services/
     │   ├── routes/
+    │   ├── middleware/
     │   ├── database/
     │   └── server.js
     ├── package.json
@@ -160,6 +165,33 @@ npm run dev
 ```
 O frontend estará rodando em `http://localhost:5173`
 
+## Documentação da API
+
+O projeto possui documentação automática da API através do **Swagger/OpenAPI**, facilitando o teste e integração dos endpoints.
+
+### Acessar a Documentação
+
+Após iniciar o backend, acesse:
+```
+http://localhost:3000/api-docs
+```
+
+### Recursos da Documentação
+
+- **Interface interativa**: Teste os endpoints diretamente pelo navegador
+- **Schemas detalhados**: Estrutura completa de request/response
+- **Autenticação JWT**: Suporte para testar endpoints protegidos
+- **Tags organizadas**: Agrupamento por funcionalidade (Autenticação, Produtos, Carrinho, etc.)
+
+### Endpoints Documentados
+
+- **Autenticação**: register, login, forgot-password, reset-password
+- **Produtos**: classic-coffees, most-famous, customizations
+- **Carrinho**: add-classic, get cart, update quantity, remove item
+- **Café Personalizado**: add-custom
+- **Perfil**: get profile
+- **Pedidos**: checkout
+
 ## Testes
 
 O projeto está preparado para automação de testes com atributos `data-testid` em todos os componentes principais. Os identificadores seguem o padrão `kebab-case` e são descritivos para facilitar a escrita de testes.
@@ -174,23 +206,33 @@ O projeto está preparado para automação de testes com atributos `data-testid`
 
 ## API Endpoints
 
+> **Nota**: Para documentação completa e interativa da API, acesse [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
 ### Autenticação
 - `POST /api/auth/register` - Registro de usuário
 - `POST /api/auth/login` - Login de usuário
-- `GET /api/auth/profile` - Perfil do usuário
+- `POST /api/auth/forgot-password` - Solicitar recuperação de senha
+- `POST /api/auth/reset-password` - Redefinir senha
 
 ### Produtos
 - `GET /api/classic-coffees` - Lista de cafés clássicos
 - `GET /api/most-famous` - Lista de cafés mais famosos
-- `GET /api/customization-options` - Opções de personalização
+- `GET /api/customizations` - Opções de personalização
 
 ### Carrinho
 - `GET /api/cart` - Obter carrinho
-- `POST /api/cart/classic` - Adicionar café clássico
-- `POST /api/cart/custom` - Adicionar café personalizado
-- `PUT /api/cart/item/:id` - Atualizar quantidade
-- `DELETE /api/cart/item/:id` - Remover item
-- `POST /api/cart/checkout` - Finalizar pedido
+- `POST /api/cart/add-classic` - Adicionar café clássico ao carrinho
+- `PUT /api/cart/items/:itemId` - Atualizar quantidade
+- `DELETE /api/cart/items/:itemId` - Remover item
+
+### Café Personalizado
+- `POST /api/custom-coffee/add-custom` - Adicionar café personalizado ao carrinho
+
+### Perfil
+- `GET /api/profile` - Obter perfil e histórico de pedidos (requer autenticação)
+
+### Pedidos
+- `POST /api/orders/checkout` - Finalizar pedido (checkout)
 
 ## Sistema de Pontos
 

@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 const coffeeRoutes = require('./src/routes/coffeeRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
 const customCoffeeRoutes = require('./src/routes/customCoffeeRoutes');
@@ -22,13 +24,15 @@ app.use(cors({
 
 // Use as rotas do backend
 app.use('/api', coffeeRoutes);
-app.use('/api/cart', cartRoutes); //as rotas do carrinho terão o prefixo 
+app.use('/api/cart', cartRoutes); //as rotas do carrinho terão o prefixo
 app.use('/api/custom-coffee', customCoffeeRoutes); // Rotas para café personalizado
 app.use('/api/customizations', customizationRoutes); // Rotas para opções de personalização
 app.use('/api/auth', authRoutes); // Rotas para autenticação
 app.use('/api/profile', profileRoutes); // Rotas para perfil do usuário
 app.use('/api/orders', orderRoutes); // Rotas para pedidos
 
+// Rota da documentação Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
     res.send('Backend da Cafeteria Bug Café está rodando!');

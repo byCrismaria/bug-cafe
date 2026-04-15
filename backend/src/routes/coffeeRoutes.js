@@ -2,10 +2,40 @@ const express = require('express');
 const router = express.Router();
 const coffeeController = require('../controllers/coffeeController');
 
-// Define a rota GET para os cafés clássicos
+/**
+ * @swagger
+ * /api/classic-coffees:
+ *   get:
+ *     summary: Listar cafés clássicos
+ *     tags: [Produtos]
+ *     responses:
+ *       200:
+ *         description: Lista de cafés clássicos retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Coffee'
+ */
 router.get('/classic-coffees', coffeeController.getClassicCoffees);
 
-// Define a rota GET para os cafés mais famosos
+/**
+ * @swagger
+ * /api/most-famous:
+ *   get:
+ *     summary: Listar cafés mais famosos
+ *     tags: [Produtos]
+ *     responses:
+ *       200:
+ *         description: Lista de cafés mais famosos retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Coffee'
+ */
 router.get('/most-famous', coffeeController.getMostFamous);
 
 module.exports = router;

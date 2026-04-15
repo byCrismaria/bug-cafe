@@ -193,6 +193,34 @@ const apiService = {
     }
   },
 
+  /**
+   * Busca as opções de personalização para o "Monte seu Café".
+   * Endpoint: GET /api/customizations
+   */
+  async fetchCustomizations() {
+    try {
+      const response = await api.get('/customizations');
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Erro ao buscar personalizações:', error);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao buscar opções de personalização.');
+    }
+  },
+
+  /**
+   * Busca o perfil do usuário autenticado (dados + histórico de pedidos).
+   * Endpoint: GET /api/profile
+   */
+  async fetchProfile() {
+    try {
+      const response = await api.get('/profile');
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao carregar perfil.');
+    }
+  },
+
   // apiService.js - Funções de autenticação
 
   /**

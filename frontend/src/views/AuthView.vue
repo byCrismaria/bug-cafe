@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <div>
     <HeroBanner />    
     <v-container class="py-12">      
       <v-row>
@@ -14,7 +14,7 @@
         </v-col>
       </v-row>
     </v-container>
-  </v-app>
+  </div>
 </template>
 
 <script setup>
@@ -23,10 +23,5 @@ import LoginRegistration from '../components/auth/LoginRegistration.vue';
 import MostFamousCoffees from '../components/home/MostFamousCoffees.vue';
 </script>
 
-<style>
-/* Estilos globais - coloque no seu arquivo principal de CSS */
-body {
-  font-family: 'Inter', sans-serif;
-  color: #4A3F35; 
-}
+<style scoped>
 </style>

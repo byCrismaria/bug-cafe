@@ -108,13 +108,6 @@
       </v-row>
     </v-card>
 
-    <v-snackbar v-model="snackbar.visible" :timeout="3000" :color="snackbar.color" location="top right"
-      variant="elevated">
-      {{ snackbar.text }}
-      <template v-slot:actions>
-        <v-btn icon="mdi-close" variant="text" @click="snackbar.visible = false"></v-btn>
-      </template>
-    </v-snackbar>
   </v-container>
 </template>
 
@@ -123,10 +116,12 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import apiService from '../../services/apiService.js';
 import { useAuth } from '../../composables/useAuth.js';
+import { useSnackbar } from '../../composables/useSnackbar.js';
 import ForgotPassword from './ForgotPassword.vue';
 
 const router = useRouter();
 const { setAuth } = useAuth();
+const { showSnackbar } = useSnackbar();
 const loginForm = ref(null);
 const registerForm = ref(null);
 
@@ -141,12 +136,6 @@ const showPass = reactive({
   confirm: false,
 });
 
-const snackbar = reactive({
-  visible: false,
-  text: '',
-  color: 'success'
-});
-
 const loginData = reactive({
   email: '',
   password: '',
@@ -159,13 +148,6 @@ const registerData = reactive({
   confirmPassword: '',
   receiveNews: false,
 });
-
-// Funções de feedback
-const showSnackbar = (message, color = 'success') => {
-  snackbar.text = message;
-  snackbar.color = color;
-  snackbar.visible = true;
-};
 
 // Funções de Validação
 const rules = reactive({

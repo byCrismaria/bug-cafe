@@ -2,10 +2,6 @@
   <v-responsive class="mx-auto" max-width="1200">
     <v-card elevation="5" rounded="xl" class="pa-6 pa-md-8">
       <h2 class="text-h4 font-weight-bold text-brown-darken-3 mb-2">Seu Carrinho</h2>
-      <p class="text-grey-darken-1 mb-6">
-        Seu código para referência:
-        <span class="font-weight-medium text-amber-darken-3">{{ cartData.userId }}</span>
-      </p>
 
       <v-divider class="mb-2"></v-divider>
 
@@ -15,21 +11,22 @@
       </div>
 
       <!-- Lista de Itens do Carrinho -->
-      <div v-if="!isLoading && cartData.items.length > 0" class="space-y-6">
+      <div v-else-if="cartData.items.length > 0">
         <div v-for="item in cartData.items" :key="item.itemId"
           class="d-flex flex-column flex-md-row align-start align-md-center justify-space-between pb-4 border-b">
           <!-- Detalhes do Item e Imagem (Lado Esquerdo) -->
-          <div class="d-flex align-center space-x-4 w-50 mb-6 mb-md-0">
+          <div class="d-flex align-center ga-4 w-100 w-md-50 mb-6 mb-md-0">
             <v-img :src="item.image || getPlaceholderImage(item.name)" :alt="item.name" cover width="80" height="80"
               class="rounded-lg flex-shrink-0" />
 
             <div class="flex-grow-1 mr-4 pa-6">
+              <div class="text-subtitle-1 font-weight-bold text-grey-darken-4">{{ item.name }}</div>
               <div v-if="item.is_customizable && item.customizations && item.customizations.length"
                 class="text-caption text-grey-darken-1 mt-1">
                 <span v-for="(custom, idx) in item.customizations" :key="idx" class="mr-1">
                   {{ custom.name }} ({{ custom.category }}){{ idx < item.customizations.length - 1 ? ',' : '' }} </span>
               </div>
-              <p v-else-if="item.description" class="text-caption text-grey-darken-1">{{ item.description }}</p>
+              <p v-else-if="item.description" class="text-caption text-grey-darken-1 mt-1">{{ item.description }}</p>
 
 
               <!-- Preço Unitário (Mobile/Tablet) -->
@@ -91,7 +88,7 @@
       <div v-if="cartData.items.length > 0" class="d-flex flex-column flex-md-row justify-end mt-8">
         <!-- Coluna do Sumário -->
         <!-- Adicionada margem inferior mb-6 para mobile -->
-        <div class="text-grey-darken-1 text-sm md:w-1/2 md:max-w-xs mb-6 md:mb-0">
+        <div class="text-grey-darken-1 text-body-2 w-100 w-md-50 mb-6 mb-md-0" style="max-width: 360px;">
           <div class="d-flex justify-space-between align-center mb-2">
             <span>Subtotal do Pedido:</span>
             <span class="font-weight-medium text-grey-darken-4">{{ formatPrice(cartData.subtotal) }}</span>
@@ -110,8 +107,8 @@
         <!-- Botão de Checkout -->
         <!-- Adicionada margem esquerda ml-md-8 para desktop para separar do sumário -->
         <div class="flex-shrink-0 mt-0 ml-md-8">
-          <v-btn class="w-full text-white font-weight-medium px-6 py-3 rounded-xl shadow-lg transition-all"
-            color="#b45309" size="x-large" variant="flat" @click="checkout" :loading="isCheckingOut"
+          <v-btn class="text-white font-weight-medium px-6 py-3 rounded-xl elevation-4"
+            color="#b45309" size="x-large" variant="flat" block @click="showCheckoutDialog = true"
             :disabled="isCheckingOut">
             Continuar para Pagamento
           </v-btn>
@@ -120,68 +117,71 @@
     </v-card>
   </v-responsive>
 
-  <!-- Snackbar para Notificações -->
-  <v-snackbar v-model="snackbar.visible" :timeout="3000" :color="snackbar.color" location="top right"
-    variant="elevated">
-    {{ snackbar.text }}
-    <template v-slot:actions>
-      <v-btn icon="mdi-close" variant="text" @click="snackbar.visible = false"></v-btn>
-    </template>
-  </v-snackbar>
+  <!-- Dialog de Confirmação de Checkout -->
+  <v-dialog v-model="showCheckoutDialog" max-width="440" persistent>
+    <v-card rounded="lg" class="pa-2">
+      <v-card-title class="text-h6 font-weight-bold pt-4 px-6">
+        Confirmar Pedido
+      </v-card-title>
+      <v-card-text class="px-6">
+        Deseja finalizar o pedido no valor de <strong>{{ formatPrice(cartData.total) }}</strong>?
+      </v-card-text>
+      <v-card-actions class="px-6 pb-4">
+        <v-spacer />
+        <v-btn variant="text" color="grey-darken-1" @click="showCheckoutDialog = false" :disabled="isCheckingOut">Cancelar</v-btn>
+        <v-btn color="#b45309" variant="flat" class="text-white" @click="checkout" :loading="isCheckingOut">Confirmar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- Dialog de Confirmação de Remoção -->
+  <v-dialog v-model="showRemoveDialog" max-width="400">
+    <v-card rounded="lg" class="pa-2">
+      <v-card-title class="text-h6 font-weight-bold pt-4 px-6">
+        Remover item
+      </v-card-title>
+      <v-card-text class="px-6">
+        Deseja remover este item do carrinho?
+      </v-card-text>
+      <v-card-actions class="px-6 pb-4">
+        <v-spacer />
+        <v-btn variant="text" color="grey-darken-1" @click="showRemoveDialog = false">Cancelar</v-btn>
+        <v-btn color="red-darken-2" variant="flat" class="text-white" @click="confirmRemoveItem">Remover</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import apiService from '../../services/apiService.js';
 import { useCart } from '../../composables/useCart.js';
+import { useSnackbar } from '../../composables/useSnackbar.js';
+import { formatPrice, getPlaceholderImage as getPlaceholderBase } from '../../utils/formatters.js';
+
+const router = useRouter();
 const { cartState, removeItemFromCart, loadCart } = useCart();
+const { showSnackbar } = useSnackbar();
+
+const getPlaceholderImage = (name) => getPlaceholderBase(name, { width: 80, height: 80, bgColor: 'd7ccc8', textColor: '4A3F35' });
 
 // --- Constantes e Variáveis Reativas ---
 const TAX_RATE = 0.05; // 5% de taxa de imposto/serviço
 
 const isLoading = ref(true);
 const isCheckingOut = ref(false);
+const showCheckoutDialog = ref(false);
+const showRemoveDialog = ref(false);
+const pendingRemoveId = ref(null);
 
 // Estrutura do Carrinho adaptada ao retorno da API
 const cartData = reactive({
-  userId: localStorage.getItem('userId') || localStorage.getItem('cartId') || 'Convidado',
   items: [],
   total: 0,
   subtotal: 0,
   taxes: 0,
 });
-
-const snackbar = reactive({
-  visible: false,
-  text: '',
-  color: 'success'
-});
-
-// --- Funções Auxiliares ---
-
-const showSnackbar = (text, color = 'info') => {
-  snackbar.text = text;
-  snackbar.color = color;
-  snackbar.visible = true;
-};
-
-/** Formata um valor (que pode ser string ou number) para o formato de moeda Real. */
-const formatPrice = (price) => {
-  // Garante que o valor seja tratado como um número antes de formatar
-  const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-  if (isNaN(numericPrice)) return 'R$ 0,00';
-
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(numericPrice);
-};
-
-/** Gera imagem placeholder baseada no nome. */
-const getPlaceholderImage = (name) => {
-  const text = name.split(' ')[0].toUpperCase().substring(0, 5);
-  return `https://placehold.co/80x80/d7ccc8/4A3F35?text=${text}`;
-};
 
 /** Calcula subtotal e impostos baseado no total da API. */
 const calculateTotals = (totalFromApi) => {
@@ -207,7 +207,6 @@ const syncCartData = () => {
     subtotal: parseFloat(item.subtotal),
   }));
   calculateTotals(cartState.total || 0);
-  cartData.userId = localStorage.getItem('authToken') ? 'Usuário Logado' : (localStorage.getItem('cartId') || 'Convidado');
 };
 
 /** Carrega os dados do carrinho do backend. */
@@ -238,14 +237,6 @@ const loadCartItens = async () => {
 
     calculateTotals(data.total || 0);
 
-    // Atualiza o ID de referência
-    cartData.userId = userId || cartId;
-
-    // Exibe a mensagem do backend, se houver
-    if (data.message) {
-      showSnackbar(data.message, 'info');
-    }
-
   } catch (error) {
     // Inicializa o carrinho vazio em caso de erro
     cartData.items = [];
@@ -274,9 +265,6 @@ const updateCartItemQuantity = async (orderItemId, change) => {
     const result = await apiService.updateCartItemQuantity(orderItemId, newQuantity);
     console.log('Resposta da atualização:', result);
 
-    const responseData = result?.data || result || {};
-    // Atualiza os dados locais
-    const newSubtotal = responseData.new_subtotal || (item.unit_price * newQuantity);
     await loadCartItens();
 
     showSnackbar('Quantidade atualizada com sucesso!', 'success');
@@ -287,10 +275,8 @@ const updateCartItemQuantity = async (orderItemId, change) => {
     if (error.message.includes('Estoque insuficiente') || error.message.includes('indisponível')) {
       showSnackbar(error.message, 'error');
     } else if (error.message.includes('Quantidade deve ser maior que zero.')) {
-      // Sugere remover o item
-      if (confirm('Deseja remover este item do carrinho?')) {
-        removeItem(orderItemId);
-      }
+      pendingRemoveId.value = orderItemId;
+      showRemoveDialog.value = true;
     } else {
       showSnackbar('Erro ao atualizar quantidade. Tente novamente.', 'error');
     }
@@ -303,39 +289,7 @@ const updateCartItemQuantity = async (orderItemId, change) => {
 };
 
 
-/* const removeItem = async (orderItemId) => {
-  const item = cartData.items.find(item => item.order_item_id === orderItemId);
-  if (!item) return;
-
-  item.isUpdating = true;
-
-  try {
-    console.log(`Removendo item ${orderItemId}`);
-    const result = await apiService.removeCartItem(orderItemId);
-    console.log('Resposta da remoção:', result); // Para debug
-
-    // Remove o item da lista local
-    const itemIndex = cartData.items.findIndex(item => item.order_item_id === orderItemId);
-    
-    if (itemIndex > -1) {
-      cartData.items.splice(itemIndex, 1);
-    }
-
-    await loadCartItens();
-    showSnackbar('Item removido do carrinho', 'success');
-  } catch (error) {
-    console.error('Erro ao remover item:', error);
-    showSnackbar(error.message || 'Erro ao remover item. Tente novamente.', 'error');
-
-    // Recarrega o carrinho para sincronizar
-    await loadCartItens();
-  } finally {
-    item.isUpdating = false;
-  }
-};
- */
-
- const removeItem = async (orderItemId) => {
+const removeItem = async (orderItemId) => {
   const item = cartData.items.find(item => item.order_item_id === orderItemId);
   if (!item) return;
 
@@ -356,23 +310,33 @@ const updateCartItemQuantity = async (orderItemId, change) => {
   }
 };
 
+const confirmRemoveItem = async () => {
+  showRemoveDialog.value = false;
+  if (pendingRemoveId.value) {
+    await removeItem(pendingRemoveId.value);
+    pendingRemoveId.value = null;
+  }
+};
+
 /** Checkout */
 const checkout = async () => {
   isCheckingOut.value = true;
   try {
     await apiService.checkoutCart();
+    showCheckoutDialog.value = false;
     showSnackbar('Pedido finalizado com sucesso!', 'success');
     
     // Limpa o carrinho local
     cartData.items = [];
     calculateTotals(0);
     
-    // Redireciona para página de confirmação ou home
+    // Redireciona para home via router (sem reload)
     setTimeout(() => {
-      window.location.href = '/';
+      router.push('/');
     }, 2000);
   } catch (error) {
     console.error('Erro no checkout:', error);
+    showCheckoutDialog.value = false;
     showSnackbar(error.message || 'Erro ao finalizar pedido. Tente novamente.', 'error');
   } finally {
     isCheckingOut.value = false;
@@ -380,7 +344,6 @@ const checkout = async () => {
 };
 
 onMounted(() => {
-  loadCart();
   loadCartItens();
 });
 </script>

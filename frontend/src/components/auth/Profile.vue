@@ -110,8 +110,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import apiService from '../../services/apiService.js';
 import { useCart } from '../../composables/useCart';
+import { formatPrice } from '../../utils/formatters.js';
 
 const { cartState, loadCart } = useCart();
 const detailsDialog = ref(false);
@@ -124,10 +125,6 @@ const user = ref({
 });
 
 const orders = ref([]);
-
-function formatPrice(value) {
-  return 'R$ ' + Number(value).toFixed(2).replace('.', ',');
-}
 
 function formatDate(dateStr) {
   const d = new Date(dateStr);
@@ -145,17 +142,12 @@ onMounted(() => {
   
   (async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const response = await axios.get('/api/profile', { headers });
-
-      if (response.data.status === 'success') {
-        const profile = response.data.data.profile;
-        user.value.name = profile.full_name;
-        user.value.email = profile.email;
-        user.value.points = profile.points_balance;
-        orders.value = response.data.data.orderHistory;
-      }
+      const data = await apiService.fetchProfile();
+      const profile = data.profile;
+      user.value.name = profile.full_name;
+      user.value.email = profile.email;
+      user.value.points = profile.points_balance;
+      orders.value = data.orderHistory;
     } catch (error) {
       console.error('Erro ao carregar perfil:', error);
       user.value.name = 'Erro ao carregar';

@@ -4,7 +4,7 @@
 
       <!-- 1. LOGO/LINK HOME -->
       <RouterLink to="/" class="text-decoration-none">
-        <div class="text-h6 font-weight-bold flex-grow-0 text-grey-darken-4 hover:text-amber-700 transition">
+        <div class="text-h6 font-weight-bold flex-grow-0 text-grey-darken-4">
           <span class="mr-2">🐞</span> Bug Café
         </div>
       </RouterLink>
@@ -16,9 +16,9 @@
 
         <!-- Botão Carrinho (Mobile) -->
         <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
+          <template v-slot:activator="{ props: tooltipProps }">
             <RouterLink to="/carrinho" class="text-decoration-none">
-              <v-btn v-bind="attrs" v-on="on" icon variant="text" class="text-grey-darken-1"
+              <v-btn v-bind="tooltipProps" icon variant="text" class="text-grey-darken-1"
                 :disabled="cartCount === 0">
                 <v-badge :content="cartCount" color="red" dot floating offset-y="-10" v-if="cartCount > 0">
                   <v-icon>mdi-cart</v-icon>
@@ -31,18 +31,18 @@
         </v-tooltip>
 
         <RouterLink v-if="!isAuthenticated" to="/login-cadastro" class="text-decoration-none">
-          <v-btn color="primary" size="small" class="font-weight-medium ms-2 d-none d-sm-flex">
+          <v-btn color="primary" size="small" class="font-weight-medium ms-2">
             Login
           </v-btn>
         </RouterLink>
         <RouterLink v-else to="/profile" class="text-decoration-none">
-          <v-btn color="primary" size="small" class="font-weight-medium ms-2 d-none d-sm-flex">
+          <v-btn color="primary" size="small" class="font-weight-medium ms-2">
             <v-icon start>mdi-account-circle</v-icon>
             {{ userName }}
           </v-btn>
         </RouterLink>
 
-        <v-btn icon variant="text" class="ms-2">
+        <v-btn icon variant="text" class="ms-2" @click="mobileDrawer = !mobileDrawer">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
       </div>
@@ -72,9 +72,9 @@
 
         <!-- Botão Carrinho com Rótulo (Desktop) -->
         <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
+          <template v-slot:activator="{ props: tooltipProps }">
             <RouterLink to="/carrinho" v-slot="{ href, navigate, isActive }">
-              <v-btn v-bind="attrs" v-on="on" variant="text" @click="navigate" :class="[
+              <v-btn v-bind="tooltipProps" variant="text" @click="navigate" :class="[
                 'nav-link',
                 'text-subtitle-1',
                 isActive ? 'text-brown-darken-3' : 'text-grey-darken-1'
@@ -112,11 +112,37 @@
 
     </v-container>
   </v-app-bar>
+
+  <!-- DRAWER MOBILE -->
+  <v-navigation-drawer v-model="mobileDrawer" temporary location="right" class="d-md-none">
+    <v-list nav density="compact" class="pt-4">
+      <v-list-item to="/" prepend-icon="mdi-home" title="Home" @click="mobileDrawer = false" />
+      <v-list-item to="/monte-seu-cafe" prepend-icon="mdi-coffee" title="Monte seu Café" @click="mobileDrawer = false" />
+      <v-list-item to="/carrinho" prepend-icon="mdi-cart" title="Carrinho" :disabled="cartCount === 0" @click="mobileDrawer = false">
+        <template v-slot:append>
+          <v-badge v-if="cartCount > 0" :content="cartCount" color="red" inline />
+        </template>
+      </v-list-item>
+
+      <v-divider class="my-2" />
+
+      <template v-if="isAuthenticated">
+        <v-list-item to="/profile" prepend-icon="mdi-account-circle" :title="userName" @click="mobileDrawer = false" />
+        <v-list-item prepend-icon="mdi-logout" title="Sair" @click="handleLogout(); mobileDrawer = false" />
+      </template>
+      <template v-else>
+        <v-list-item to="/login-cadastro" prepend-icon="mdi-login" title="Login / Cadastro" @click="mobileDrawer = false" />
+      </template>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useAuth } from '../../composables/useAuth.js';
+
+const mobileDrawer = ref(false);
 
 defineProps({
   cartCount: {

@@ -24,6 +24,7 @@ coverage/
 Thumbs.db
 ehthumbs.db
 .cache/
+.env
 
 # Arquivos Gerados pelo TypeScript
 *.tsbuildinfo

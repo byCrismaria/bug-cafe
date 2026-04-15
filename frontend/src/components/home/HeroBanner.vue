@@ -1,7 +1,7 @@
 <template>
   <section id="inicio">
     <v-carousel
-      height="450"
+      :height="$vuetify.display.smAndDown ? 300 : 450"
       show-arrows="hover"
       cycle
       hide-delimiter-background
@@ -22,7 +22,7 @@
           
           <div class="relative z-10 px-4">
             <h1 class="text-h3 text-md-h3 font-weight-black">{{ slide.title }}</h1>
-            <p class="mt-4 text-subtitle-1 text-md-h6 drop-shadow-md">{{ slide.subtitle }}</p>
+            <p class="mt-4 text-subtitle-1 text-md-h6 drop-shadow-lg">{{ slide.subtitle }}</p>
           </div>
         </v-img>
       </v-carousel-item>
@@ -38,17 +38,17 @@ const slides = ref([
   {
     title: "Bem-vindo(a) ao Bug Café!",
     subtitle: "Seu código para uma pausa perfeita.",
-    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=2940&auto=format&fit=crop", // Imagem do protótipo
+    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=2940&auto=format&fit=crop",
   },
   {
     title: "Conecte-se com o Melhor Café",
     subtitle: "Do Expresso ao Latte, um sabor para cada linha de código.",
-    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=2940&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=2940&auto=format&fit=crop",
   },
   {
     title: "Aquele Debug que Merece um Doce",
     subtitle: "Confira nossas sobremesas artesanais.",
-    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=2940&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2940&auto=format&fit=crop",
   },
 ]);
 </script>

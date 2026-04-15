@@ -3,12 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import MonteSeuCafeView from '../views/MonteSeuCafeView.vue';
 import CartView from '../views/CartView.vue';
-import AuthView from '../views/AuthView.vue';
-import AuthProfile from '../views/AuthProfile.vue';
-import AboutView from '../views/AboutView.vue';
-import TermsOfServiceView from '../views/TermsOfServiceView.vue';
-import ContactView from '../views/ContactView.vue';
-import ResetPasswordView from '../views/ResetPasswordView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,12 +25,12 @@ const router = createRouter({
     {
       path: '/login-cadastro',
       name: 'auth',
-      component: AuthView
+      component: () => import('../views/AuthView.vue')
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: AuthProfile,
+      component: () => import('../views/AuthProfile.vue'),
       meta: { 
         requiresAuth: true 
       }
@@ -44,32 +38,35 @@ const router = createRouter({
     {
       path: '/about',
       name: 'About',
-      component: AboutView
+      component: () => import('../views/AboutView.vue')
     },
     {
       path: '/terms',
       name: 'TermsOfService',
-      component: TermsOfServiceView
+      component: () => import('../views/TermsOfServiceView.vue')
     },
     {
       path: '/contact',
       name: 'Contact',
-      component: ContactView
+      component: () => import('../views/ContactView.vue')
     },
     {
       path: '/reset-senha',
       name: 'ResetPassword',
-      component: ResetPasswordView
+      component: () => import('../views/ResetPasswordView.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/NotFoundView.vue')
     },
   ]
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const isAuthenticated = !!localStorage.getItem('authToken');
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login-cadastro');
-  } else {
-    next();
+    return '/login-cadastro';
   }
 });
 

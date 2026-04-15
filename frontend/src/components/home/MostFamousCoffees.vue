@@ -6,18 +6,17 @@
     <v-slide-group-item
       v-for="coffee in mostFamous"
       :key="coffee.name"
-      v-slot="{}"
     >
       <v-card
         elevation="5"
         class="ma-3 overflow-hidden d-flex flex-row justify-space-between"
         width="500" 
-        min-width="320"        
+        min-width="280"        
         variant="flat"
 
       >
         <v-img 
-          :src="coffee.image || getPlaceholderImage(coffee.name)" 
+          :src="coffee.image || getPlaceholderImage(coffee.name, { width: 200, height: 200, bgColor: '6D4C41' })" 
           :alt="coffee.name" 
           width="150" 
           class="flex-shrink-0"
@@ -36,6 +35,8 @@
             class="mt-2"
             height="40"
             @click.stop="addToCart(coffee.id)"
+            :loading="loadingId === coffee.id"
+            :disabled="loadingId === coffee.id"
           >
             Adicionar ao Carrinho
           </v-btn> 		
@@ -45,104 +46,33 @@
     </v-slide-group-item>
   </v-slide-group>
 
-  <!-- Snackbar para notificações -->
-  <v-snackbar
-      v-model="snackbar.visible"
-      :timeout="3000"
-      :color="snackbar.color"
-      location="top right"
-      variant="elevated"
-    >
-      {{ snackbar.text }}
-      <template v-slot:actions>
-        <v-btn
-          icon="mdi-close"
-          variant="text"
-          @click="snackbar.visible = false"
-        ></v-btn>
-      </template>
-    </v-snackbar>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive 	} from 'vue';
+import { ref, onMounted } from 'vue';
 import { useCart } from '../../composables/useCart.js';
-import axios from 'axios';
+import { useSnackbar } from '../../composables/useSnackbar.js';
+import apiService from '../../services/apiService.js';
+import { formatPrice, getPlaceholderImage } from '../../utils/formatters.js';
 
 const { addClassicToCart } = useCart();
+const { showSnackbar } = useSnackbar();
 
 const mostFamous = ref([]);
-const API_URL = '/api/most-famous';
+const loadingId = ref(null);
 
-const snackbar = reactive({
-  visible: false,
-  text: '',
-  color: 'success'
-});
-
-const showSnackbar = (text, color = 'info') => {
-  snackbar.text = text;
-  snackbar.color = color;
-  snackbar.visible = true;
-};
-
-const getPlaceholderImage = (name) => {
-    const text = name.split(' ')[0].toUpperCase().substring(0, 5);
-    return `https://placehold.co/200x200/6D4C41/FFFFFF?text=${text}`;
-};
-
-
-// Função para buscar os dados da API
 const fetchMostFamous = async () => {
   try {
-    const response = await axios.get(API_URL);
-    if (response.data && response.data.status === 'success') {
-      mostFamous.value = response.data.data;
-    }
+    const data = await apiService.getMostFamousCoffees();
+    mostFamous.value = Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Erro ao buscar os cafés mais famosos:", error);
     showSnackbar("Não foi possível carregar os cafés mais famosos.", "error");
   }
 };
 
-/* // Função para adicionar ao carrinho (reutilizando a lógica do outro componente)
 const addToCart = async (coffeeId) => {
-
-    const token = localStorage.getItem('authToken');
-    let cartId = localStorage.getItem('cartId');
-
-    const authData = {};
-
-    if (token) {
-        authData.token = token;
-    } else {
-        if (!cartId) {
-            cartId = `guest-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-            localStorage.setItem('cartId', cartId);
-        }
-        authData.cartId = cartId;
-    }
-
-    try {
-        const headers = authData.token ? { 'Authorization': `Bearer ${authData.token}` } : {};
-        const body = { productId: coffeeId, quantity: 1 };
-        if (authData.cartId) { body.cartId = authData.cartId; }
-
-        const response = await axios.post('/api/cart/add-classic', body, { headers });
-        
-        if (response.data.status === 'success') {
-          const coffeeName = mostFamous.value.find(c => c.id === coffeeId)?.name || 'Item';
-          const successMessage = response.data.message || `${coffeeName} adicionado com sucesso!`;
-          showSnackbar(successMessage, 'success');
-        }
-    } catch (error) {
-        console.error('Erro ao adicionar item ao carrinho:', error);
-        const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
-        showSnackbar(`Erro: ${errorMessage}`, 'error');
-    }
-}; */
-
-const addToCart = async (coffeeId) => {
+  loadingId.value = coffeeId;
   try {
     const successMessage = await addClassicToCart(coffeeId, 1);
     const coffeeName = mostFamous.value.find(c => c.id === coffeeId)?.name || 'Item';
@@ -151,6 +81,8 @@ const addToCart = async (coffeeId) => {
     console.error('Erro ao adicionar item ao carrinho:', error);
     const errorMessage = error.response?.data?.message || 'Não foi possível adicionar o item.';
     showSnackbar(`Erro: ${errorMessage}`, 'error');
+  } finally {
+    loadingId.value = null;
   }
 };
 

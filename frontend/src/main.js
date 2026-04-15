@@ -8,7 +8,6 @@ import * as directives from 'vuetify/directives';
 import '@mdi/font/css/materialdesignicons.css'; 
 import { createVuetify } from 'vuetify';
 
-
 import router from './routes';
 
 // Criação da instância do Vuetify

@@ -19,11 +19,5 @@ import HeroBanner from '../components/home/HeroBanner.vue';
 import ClassicCoffeesCarousel from '../components/home/ClassicCoffeesCarousel.vue';
 import MostFamousCoffees from '../components/home/MostFamousCoffees.vue';
 </script>
-<style>
-
-body {
-  font-family: 'Inter', sans-serif;
-  color: #4A3F35; 
-}
-
+<style scoped>
 </style>

@@ -99,35 +99,17 @@
     </v-responsive>
   </v-container>
 
-  <v-snackbar v-model="snackbar.visible" :timeout="3000" :color="snackbar.color" location="top right"
-    variant="elevated">
-    {{ snackbar.text }}
-  </v-snackbar>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useCart } from '../../composables/useCart.js';
-import axios from 'axios';
+import { useSnackbar } from '../../composables/useSnackbar.js';
+import apiService from '../../services/apiService.js';
+import { formatPrice as formatPriceUtil } from '../../utils/formatters.js';
 
 const { addItemToCart } = useCart();
-
-// --- ESTADO DO SNACKBAR ---
-const snackbar = reactive({
-  visible: false,
-  text: '',
-  color: 'success'
-});
-
-const showSnackbar = (text, color = 'info') => {
-  snackbar.text = text;
-  snackbar.color = color;
-  snackbar.visible = true;
-};
-
-
-// --- PROPS & EMITS ---
-const emit = defineEmits(['add-to-cart']);
+const { showSnackbar } = useSnackbar();
 
 // --- ESTADO DA API ---
 const baseOptions = ref([]);
@@ -164,8 +146,7 @@ const fetchCustomizations = async () => {
   isLoading.value = true;
   fetchError.value = false;
   try {
-    const response = await axios.get('/api/customizations');
-    const data = response.data.data;
+    const data = await apiService.fetchCustomizations();
 
     // 1. Base (Agora carrega o preço base diretamente)
     baseOptions.value = mapApiOptions(data.Base || []);
@@ -204,12 +185,7 @@ const fetchCustomizations = async () => {
 onMounted(fetchCustomizations);
 
 // --- FUNÇÕES UTILITÁRIAS ---
-const formatPrice = (price, isModifier = false) => {
-  // Formata o preço para R$ X,XX
-  const formatted = `R$ ${price.toFixed(2).replace('.', ',')}`;
-  // Adiciona "+" se for um modificador positivo
-  return isModifier && price > 0 ? `+ ${formatted}` : formatted;
-};
+const formatPrice = formatPriceUtil;
 
 // --- PROPRIEDADES COMPUTADAS (A LÓGICA DO RESUMO) ---
 
@@ -300,12 +276,6 @@ const addCustomCoffee = async () => {
 
 };
 
-/**
- * Adiciona um café personalizado ao carrinho, usando o array de IDs de customização.
- * * @param {object} customCoffee - O objeto do café personalizado emitido pelo BuildCoffees.vue.
- * @param {array} customCoffee.customizationIds - O array de IDs de opção (base, tamanho, sabores, etc.).
- * @param {string} customCoffee.name - Nome para o feedback do usuário.
- */
 
 </script>
 
